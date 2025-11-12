@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BookApi.Models;
 using BookApi.Services;
+using ILogger = BookApi.Services.ILogger;
 
 namespace BookApi.Controllers;
 
@@ -9,10 +10,12 @@ namespace BookApi.Controllers;
 public class BooksController : ControllerBase
 {
 	private readonly IBookService _bookService;
+	private readonly ILogger _logger;
 
-	public BooksController(IBookService bookService)
+	public BooksController(IBookService bookService, ILogger logger)
 	{
 		_bookService = bookService;
+		_logger = logger;
 	}
 
 	[HttpGet]
@@ -29,6 +32,7 @@ public class BooksController : ControllerBase
 	[HttpPost]
 	public async Task<ActionResult<Book>> Create(Book book)
 	{
+		_logger.Log($"Adding book: {book.Title}");
 		var created = await _bookService.AddBookAsync(book);
 		return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
 	}

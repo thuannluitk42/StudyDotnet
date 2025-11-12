@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // DI: THE STANDARD (Ch3.7)
 builder.Services.AddSingleton<IStorageBroker, InMemoryStorageBroker>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddTransient<BookApi.Services.ILogger, ConsoleLogger>();
 
 // MVC + Swagger
 builder.Services.AddControllers();
@@ -43,6 +44,7 @@ var app = builder.Build();
 // Development: Swagger UI
 if (app.Environment.IsDevelopment())
 {
+
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
