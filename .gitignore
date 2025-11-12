@@ -1,1 +1,133 @@
+# Visual Studio / .NET
 .vs/
+.vscode/
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+artifacts/
+publish/
+dist/
+
+# Rider
+.idea/
+*.sln.iml
+
+# ASP.NET / IIS
+launchSettings.json
+Properties/launchSettings.json
+
+# User secrets
+secrets.json
+**/secrets.json
+secrets.*.json
+secrets/
+
+# NuGet
+*.nupkg
+# NuGet v3
+.packages/
+.nuget/
+.nuget/packages/
+project.lock.json
+project.fragment.lock.json
+packages/
+
+# Rider caches
+.idea/
+.idea/*
+
+# Dotnet tools and caches
+dotnet-local/
+.nuget/work/
+.nuget/plugins-cache/
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+Icon?
+.DS_Store
+
+# Logs
+*.log
+logs/
+debug.log
+
+# Test result files
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Visual Studio Code workspace/settings
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Coverage output
+coverage/*
+coverage.*.xml
+.opencover/*
+
+# IIS
+iisexpress/
+IISExpress.Tracing/
+
+# Web publish folder
+wwwroot/
+
+# Publish artifacts from GitHub Actions / CI
+*.deployment
+.deploy/
+
+# Database files
+*.mdf
+*.ldf
+*.sqlite
+*.db
+
+# Certificates
+*.pfx
+*.p12
+*.key
+*.crt
+
+# Generated swagger / docs (if you generate locally)
+swagger/
+doc/
+docs/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+docker-compose.override.yml
+**/docker-compose.override.yml
+**/docker-compose.*.yml
+
+# JetBrains Rider caches
+.idea/
+*.sln.iml
+.idea_modules/
+
+# Editor temp files
+*~
+*.swp
+*.swo
+
+# VS Test explorer cache
+.vstest/
+
+# Optional: if you produce single-file execables or publish self-contained
+*.exe
+*.dll
+
+# Optional: Mac/Unix
+*.pid
+*.seed
