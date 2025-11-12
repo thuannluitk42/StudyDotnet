@@ -1,8 +1,9 @@
 {
   "openapi": "3.0.4",
   "info": {
-    "title": "BookApi",
-    "version": "1.0"
+    "title": "Book API (.NET 10 RC2)",
+    "description": "Ch4: Pipeline + Custom Middleware",
+    "version": "v1"
   },
   "paths": {
     "/api/Books": {
