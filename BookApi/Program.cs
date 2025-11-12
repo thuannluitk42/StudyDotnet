@@ -55,4 +55,13 @@ app.UseRequestTiming();     // ← Custom middleware của bạn
 app.UseCors();              // ← ĐÃ THÊM — HOÀN HẢO
 app.MapControllers();
 
+app.UseExceptionHandler(errorApp =>
+{
+	errorApp.Run(async context =>
+	{
+		context.Response.StatusCode = 500;
+		await context.Response.WriteAsync("Something went wrong!");
+	});
+});
+
 app.Run();
