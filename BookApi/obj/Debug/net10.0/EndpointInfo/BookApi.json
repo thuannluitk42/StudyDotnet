@@ -1,17 +1,9 @@
 {
-  "openapi": "3.1.1",
+  "openapi": "3.0.4",
   "info": {
-    "title": "BookApi | v1",
-    "version": "1.0.0"
+    "title": "BookApi",
+    "version": "1.0"
   },
-  "servers": [
-    {
-      "url": "https://localhost:7209"
-    },
-    {
-      "url": "http://localhost:5238"
-    }
-  ],
   "paths": {
     "/api/Books": {
       "get": {
@@ -71,8 +63,7 @@
                 "$ref": "#/components/schemas/Book"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -109,11 +100,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": "integer",
               "format": "int32"
             }
           }
@@ -151,11 +138,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": "integer",
               "format": "int32"
             }
           }
@@ -177,8 +160,7 @@
                 "$ref": "#/components/schemas/Book"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -196,11 +178,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": "integer",
               "format": "int32"
             }
           }
@@ -219,24 +197,23 @@
         "type": "object",
         "properties": {
           "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "integer",
             "format": "int32"
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "author": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "publishedDate": {
             "type": "string",
             "format": "date-time"
           }
-        }
+        },
+        "additionalProperties": false
       }
     }
   },

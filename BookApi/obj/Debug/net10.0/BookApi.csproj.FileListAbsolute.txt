@@ -8,6 +8,9 @@ D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\BookApi.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\BookApi.pdb
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.OpenApi.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.csproj.AssemblyReference.cache
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\rpswa.dswa.cache.json
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.GeneratedMSBuildEditorConfig.editorconfig
@@ -16,6 +19,7 @@ D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.AssemblyInfo.
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.csproj.CoreCompileInputs.cache
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.MvcApplicationPartsAssemblyInfo.cs
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.MvcApplicationPartsAssemblyInfo.cache
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.sourcelink.json
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\rjimswa.dswa.cache.json
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
