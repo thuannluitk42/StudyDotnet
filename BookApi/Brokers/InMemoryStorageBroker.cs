@@ -37,4 +37,11 @@ public class InMemoryStorageBroker : IStorageBroker
 		if (book != null) _books.Remove(book);
 		return Task.CompletedTask;
 	}
+
+	public Book? GetById(int id) => _books.FirstOrDefault(b => b.Id == id);
+
+	public List<Book> GetBooksByYear(int year)
+	{
+		return _books.Where(b => b.PublishedYear == year).ToList();
+	}
 }

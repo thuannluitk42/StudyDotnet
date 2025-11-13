@@ -56,6 +56,22 @@
               "target": "Package",
               "version": "[10.0.0, )"
             },
+            "OpenTelemetry.Exporter.Console": {
+              "target": "Package",
+              "version": "[1.13.1, )"
+            },
+            "OpenTelemetry.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[1.13.1, )"
+            },
+            "OpenTelemetry.Instrumentation.AspNetCore": {
+              "target": "Package",
+              "version": "[1.13.0, )"
+            },
+            "OpenTelemetry.Instrumentation.Http": {
+              "target": "Package",
+              "version": "[1.13.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[10.0.0, )"

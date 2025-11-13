@@ -37,4 +37,14 @@ public class BookService : IBookService
 
 	public async Task DeleteBookAsync(int id) =>
 		await _storageBroker.DeleteBookAsync(id);
+
+	public Book? GetById(int id)
+	{
+		return _storageBroker.GetById(id);
+	}
+
+	public List<Book> GetBooksByYear(int year)
+	{
+		return _storageBroker.GetBooksByYear(year);
+	}
 }

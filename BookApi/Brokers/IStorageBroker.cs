@@ -9,5 +9,8 @@ namespace BookApi.Brokers
 		Task<Book> AddBookAsync(Book book);
 		Task UpdateBookAsync(Book book);
 		Task DeleteBookAsync(int id);
+		Book? GetById(int id);
+
+		List<Book> GetBooksByYear(int year);
 	}
 }

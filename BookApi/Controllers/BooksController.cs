@@ -51,4 +51,18 @@ public class BooksController : ControllerBase
 		await _bookService.DeleteBookAsync(id);
 		return NoContent();
 	}
+
+	[HttpGet("{id:int}")]
+	public IActionResult GetById(int id)
+	{
+		var book = _bookService.GetById(id);
+		return book is null ? NotFound() : Ok(book);
+	}
+
+	[HttpGet("year/{year:year}")]
+	public IActionResult GetBooksByYear(int year)
+	{
+		var books = _bookService.GetBooksByYear(year);
+		return Ok(books);
+	}
 }

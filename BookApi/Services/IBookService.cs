@@ -9,4 +9,7 @@ public interface IBookService
 	Task<Book> AddBookAsync(Book book);
 	Task<Book> UpdateBookAsync(Book book);
 	Task DeleteBookAsync(int id);
+
+	Book? GetById(int id);
+	List<Book> GetBooksByYear(int year);
 }

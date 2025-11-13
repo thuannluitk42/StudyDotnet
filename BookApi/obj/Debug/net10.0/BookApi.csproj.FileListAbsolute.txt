@@ -9,6 +9,13 @@ D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\BookApi.pdb
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\BookApi.xml
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.OpenApi.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.Api.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.Api.ProviderBuilderExtensions.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.Exporter.Console.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.Extensions.Hosting.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.Instrumentation.AspNetCore.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.Instrumentation.Http.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll

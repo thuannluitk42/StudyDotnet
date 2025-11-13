@@ -1,36 +1,17 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using BookApi.Brokers;
 using BookApi.Models;
-using BookApi.Services;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Xunit;
 
 namespace BookApi.Tests
 {
-	public class BookServiceTests : IClassFixture<WebApplicationFactory<Program>>
+	public class ApiIntegrationTests : IClassFixture<WebApplicationFactory<Program>>  // ← ĐÂY LÀ NƠI _factory ĐẾN
 	{
-		private readonly WebApplicationFactory<Program> _factory;
+		private readonly WebApplicationFactory<Program> _factory;  // ← KHAI BÁO
 
-		public BookServiceTests(WebApplicationFactory<Program> factory)
+		public ApiIntegrationTests(WebApplicationFactory<Program> factory)
 		{
 			_factory = factory;
-		}
-
-		[Fact]
-		public async Task Should_Add_And_Retrieve_Book()
-		{
-			var broker = new InMemoryStorageBroker();
-			var service = new BookService(broker);
-			var book = new Book { Id = 1, Title = "Test" };
-
-			await service.AddBookAsync(book);
-
-			// act
-			var books = await service.GetAllBooksAsync();
-
-			// assert
-			Assert.Contains(books, b => b.Id == book.Id && b.Title == book.Title);
 		}
 
 		[Fact]
