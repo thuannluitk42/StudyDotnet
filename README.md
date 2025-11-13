@@ -30,52 +30,94 @@
 | API Documentation | Swagger + XML Comments |
 | Source Control | Git + GitHub |
 
+## CÂU HỎI PHỎNG VẤN — DỰA TRÊN 4 NGÀY HỌC CỦA BẠN  
+### **Cấp độ: Dễ → Trung bình → Khó**
+
 ---
 
-## Kiến thức phỏng vấn — Câu hỏi & Trả lời ngắn gọn
+### **DAY 1 — CHƯƠNG 3: FIRST BOOK API**
 
-### **1. The Standard là gì?**
-> **Trả lời**: `Broker → Service → Controller` — tách biệt dữ liệu, logic, API.  
-> **Lợi ích**: Dễ test, dễ bảo trì, dễ thay đổi.
+#### **Dễ**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Bạn đã học gì ở Day 1?** | Xây API đầu tiên với The Standard |
+| **The Standard gồm mấy lớp?** | 3 lớp: `Broker`, `Service`, `Controller` |
+| **Swagger dùng để làm gì?** | Tạo tài liệu API tự động |
 
-### **2. Tại sao không dùng `new` trong Controller?**
-> **Trả lời**: Dùng DI để inject `IBookService`.  
-> **Lợi ích**: Không hard-code, dễ mock trong unit test.
+#### **Trung bình**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Tại sao không `new BookService()` trong Controller?** | Dùng DI để inject `IBookService` → dễ test |
+| **XML Comments có ích gì trong Swagger?** | Hiển thị mô tả API, tham số, response |
 
-### **3. Middleware Pipeline hoạt động thế nào?**
-> **Trả lời**: Request đi qua các middleware theo thứ tự trong `Program.cs`.  
-> **Ví dụ**: `UseCors()` → `UseAuthentication()` → `MapControllers()`.
+#### **Khó**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Làm sao để `POST /api/books` trả về `201 Created` với URL chi tiết?** | Dùng `CreatedAtAction(nameof(Get), new { id = book.Id }, book)` |
 
-### **4. Custom Middleware dùng khi nào?**
-> **Trả lời**: Khi cần xử lý chung: log, timing, auth.  
-> **Ví dụ**: `RequestTimingMiddleware` ghi thời gian xử lý.
+---
 
-### **5. 3 Lifetime của DI là gì?**
-> **Trả lời**:  
-> - `Singleton`: 1 instance cho toàn app  
-> - `Scoped`: 1 instance cho mỗi request  
-> - `Transient`: Tạo mới mỗi lần gọi
+### **DAY 2 — CHƯƠNG 4: PIPELINE**
 
-### **6. Unit Test vs Integration Test?**
-> **Trả lời**:  
-> - **Unit**: Test logic riêng (`new BookService(broker)`)  
-> - **Integration**: Test toàn bộ (`WebApplicationFactory`)
+#### **Dễ**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Middleware là gì?** | Hàm xử lý request/response theo thứ tự |
+| **Bạn đã viết middleware nào?** | `RequestTimingMiddleware` |
 
-### **7. Attribute Routing là gì?**
-> **Trả lời**: Dùng `[HttpGet("{id:int}")]` để định nghĩa route.  
-> **Ví dụ**: `GET /api/books/1` → chỉ chấp nhận `id` là số.
+#### **Trung bình**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Làm sao log thời gian xử lý request?** | Dùng `Stopwatch` trong middleware |
+| **Thứ tự `UseCors()` và `MapControllers()`?** | `UseCors()` trước `MapControllers()` |
 
-### **8. Custom Route Constraint dùng khi nào?**
-> **Trả lời**: Khi cần luật riêng cho tham số route.  
-> **Ví dụ**: `year/{year:year}` → chỉ cho phép `1900–2025`.
+#### **Khó**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Nếu `UseExceptionHandler()` đặt sau `MapControllers()`, điều gì xảy ra?** | Lỗi không được bắt → trả về HTML 500 |
 
-### **9. Khi nào dùng `async/await`?**
-> **Trả lời**: Khi chờ I/O (DB, API, file).  
-> **Ví dụ**: `GetBookByIdAsync` → không block thread.
+---
 
-### **10. Minimal API có lợi gì?**
-> **Trả lời**: Viết nhanh, không cần Controller.  
-> **Ví dụ**: `app.MapGet("/hello", () => "Hi");`
+### **DAY 3 — CHƯƠNG 6: DEPENDENCY INJECTION**
+
+#### **Dễ**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **DI là gì?** | Inject dependency thay vì `new` |
+| **3 lifetime của DI là gì?** | `Singleton`, `Scoped`, `Transient` |
+
+#### **Trung bình**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Unit Test cần DI không?** | Không, có thể `new BookService(broker)` |
+| **Integration Test dùng gì?** | `WebApplicationFactory<Program>` |
+
+#### **Khó**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Làm sao phát hiện lỗi DI (circular dependency) ngay khi start?** | Dùng `.NET 10 DI Diagnostics` → `builder.Services.AddDiagnostics()` |
+
+---
+
+### **DAY 4 — CHƯƠNG 7: ROUTING & ENDPOINTS**
+
+#### **Dễ**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Attribute Routing là gì?** | `[HttpGet("{id:int}")]` |
+| **Minimal API viết thế nào?** | `app.MapGet("/hello", () => "Hi")` |
+
+#### **Trung bình**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Custom Route Constraint dùng khi nào?** | Khi cần kiểm tra tham số route (ví dụ: năm từ 1900–2025) |
+| **Bạn đã viết constraint nào?** | `year/{year:year}` → `1800` → `404` |
+
+#### **Khó**
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Làm sao test `GET /api/books/year/1800` trả về `404`?** | Dùng `WebApplicationFactory` + `client.GetAsync()` + `Assert.Equal(404, response.StatusCode)` |
+| **Nếu 2 route trùng, cái nào được chọn?** | Route cụ thể hơn (có constraint) hoặc thứ tự đăng ký |
 
 ---
 
