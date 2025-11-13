@@ -15,14 +15,17 @@
 
 ## Kiến trúc The Standard — 100% hoàn chỉnh
 
-┌─────────────────┐
-│   Controller    │ ← Nhận request, trả response
-├─────────────────┤
-│     Service     │ ← Logic nghiệp vụ
-├─────────────────┤
-│     Broker      │ ← Truy cập dữ liệu (InMemory)
-└─────────────────┘
-
++-------------+        ← Nhận request, trả response
+| Controller  |
++-------------+
+       |
++-------------+        ← Logic nghiệp vụ
+|  Service    |
++-------------+
+       |
++-------------+        ← Truy cập dữ liệu (InMemory)
+|   Broker    |
++-------------+
 
 - Tất cả đều **DI**, **testable**, **async khi cần**, **sync khi nhanh**.
 
