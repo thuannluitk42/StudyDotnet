@@ -14,18 +14,7 @@
 ---
 
 ## Kiến trúc The Standard — 100% hoàn chỉnh
-
-+-------------+        ← Nhận request, trả response
-| Controller  |
-+-------------+
-       |
-+-------------+        ← Logic nghiệp vụ
-|  Service    |
-+-------------+
-       |
-+-------------+        ← Truy cập dữ liệu (InMemory)
-|   Broker    |
-+-------------+
+<img width="453" height="234" alt="Screenshot_1" src="https://github.com/user-attachments/assets/108ff0ee-33fa-432f-b7c0-620ffbe30d99" />
 
 - Tất cả đều **DI**, **testable**, **async khi cần**, **sync khi nhanh**.
 
@@ -43,50 +32,96 @@
 
 ---
 
-## Kiến thức phỏng vấn — Câu hỏi & Trả lời ngắn gọn
+### **DAY 1 — CHƯƠNG 3: FIRST BOOK API**
 
-### **1. The Standard là gì?**
-> **Trả lời**: `Broker → Service → Controller` — tách biệt dữ liệu, logic, API.  
-> **Lợi ích**: Dễ test, dễ bảo trì, dễ thay đổi.
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Bạn đã học gì ở Day 1?** | Xây API đầu tiên với The Standard |
+| **The Standard gồm mấy lớp?** | 3 lớp: `Broker`, `Service`, `Controller` |
+| **Swagger dùng để làm gì?** | Tạo tài liệu API tự động |
 
-### **2. Tại sao không dùng `new` trong Controller?**
-> **Trả lời**: Dùng DI để inject `IBookService`.  
-> **Lợi ích**: Không hard-code, dễ mock trong unit test.
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Tại sao không `new BookService()` trong Controller?** | Dùng DI để inject `IBookService` → dễ test |
+| **XML Comments có ích gì trong Swagger?** | Hiển thị mô tả API, tham số, response |
 
-### **3. Middleware Pipeline hoạt động thế nào?**
-> **Trả lời**: Request đi qua các middleware theo thứ tự trong `Program.cs`.  
-> **Ví dụ**: `UseCors()` → `UseAuthentication()` → `MapControllers()`.
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Làm sao để `POST /api/books` trả về `201 Created` với URL chi tiết?** | Dùng `CreatedAtAction(nameof(Get), new { id = book.Id }, book)` |
 
-### **4. Custom Middleware dùng khi nào?**
-> **Trả lời**: Khi cần xử lý chung: log, timing, auth.  
-> **Ví dụ**: `RequestTimingMiddleware` ghi thời gian xử lý.
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Nếu `IBookService` có 2 implementation (`InMemory` và `SqlServer`), bạn chọn cái nào khi start app?** | Dùng `appsettings.json` + `IConfiguration` → `services.AddScoped<IBookService>(sp => config["Storage"] == "sql" ? new SqlBookService(...) : new InMemoryBookService(...))` |
+| **Làm sao để `POST /api/books` trả về `Location: /api/books/1` ngay cả khi `Get` chưa tồn tại?** | Dùng `CreatedAtRoute("GetBook", new { id = book.Id }, book)` |
 
-### **5. 3 Lifetime của DI là gì?**
-> **Trả lời**:  
-> - `Singleton`: 1 instance cho toàn app  
-> - `Scoped`: 1 instance cho mỗi request  
-> - `Transient`: Tạo mới mỗi lần gọi
+---
 
-### **6. Unit Test vs Integration Test?**
-> **Trả lời**:  
-> - **Unit**: Test logic riêng (`new BookService(broker)`)  
-> - **Integration**: Test toàn bộ (`WebApplicationFactory`)
+### **DAY 2 — CHƯƠNG 4: PIPELINE**
 
-### **7. Attribute Routing là gì?**
-> **Trả lời**: Dùng `[HttpGet("{id:int}")]` để định nghĩa route.  
-> **Ví dụ**: `GET /api/books/1` → chỉ chấp nhận `id` là số.
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Middleware là gì?** | Hàm xử lý request/response theo thứ tự |
+| **Bạn đã viết middleware nào?** | `RequestTimingMiddleware` |
 
-### **8. Custom Route Constraint dùng khi nào?**
-> **Trả lời**: Khi cần luật riêng cho tham số route.  
-> **Ví dụ**: `year/{year:year}` → chỉ cho phép `1900–2025`.
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Làm sao log thời gian xử lý request?** | Dùng `Stopwatch` trong middleware |
+| **Thứ tự `UseCors()` và `MapControllers()`?** | `UseCors()` trước `MapControllers()` |
 
-### **9. Khi nào dùng `async/await`?**
-> **Trả lời**: Khi chờ I/O (DB, API, file).  
-> **Ví dụ**: `GetBookByIdAsync` → không block thread.
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Nếu `UseExceptionHandler()` đặt sau `MapControllers()`, điều gì xảy ra?** | Lỗi không được bắt → trả về HTML 500 |
 
-### **10. Minimal API có lợi gì?**
-> **Trả lời**: Viết nhanh, không cần Controller.  
-> **Ví dụ**: `app.MapGet("/hello", () => "Hi");`
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Làm sao để `RequestTimingMiddleware` chỉ chạy với `/api/books` mà không chạy với `/health`?** | Dùng `if (!context.Request.Path.StartsWithSegments("/health")) { await _next(context); }` |
+| **Nếu có 2 middleware cùng log, làm sao tránh log 2 lần?** | Dùng `context.Items["Logged"] = true` để đánh dấu |
+
+---
+
+### **DAY 3 — CHƯƠNG 6: DEPENDENCY INJECTION**
+
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **DI là gì?** | Inject dependency thay vì `new` |
+| **3 lifetime của DI là gì?** | `Singleton`, `Scoped`, `Transient` |
+
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Unit Test cần DI không?** | Không, có thể `new BookService(broker)` |
+| **Integration Test dùng gì?** | `WebApplicationFactory<Program>` |
+
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Làm sao phát hiện lỗi DI (circular dependency) ngay khi start?** | Dùng `.NET 10 DI Diagnostics` → `builder.Services.AddDiagnostics()` |
+
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Nếu `BookService` cần `ILogger<BookService>` và `IStorageBroker`, nhưng `InMemoryStorageBroker` cũng cần `ILogger`, có circular dependency không?** | Không, vì `ILogger` là built-in, không gây vòng |
+| **Làm sao mock `IStorageBroker` trong `WebApplicationFactory` để test với dữ liệu giả?** | Dùng `ConfigureTestServices(services => services.AddScoped<IStorageBroker, FakeStorageBroker>())` |
+
+---
+
+### **DAY 4 — CHƯƠNG 7: ROUTING & ENDPOINTS**
+
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Attribute Routing là gì?** | `[HttpGet("{id:int}")]` |
+| **Minimal API viết thế nào?** | `app.MapGet("/hello", () => "Hi")` |
+
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Custom Route Constraint dùng khi nào?** | Khi cần kiểm tra tham số route |
+| **Bạn đã viết constraint nào?** | `year/{year:year}` → `1800` → `404` |
+
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Làm sao test `GET /api/books/year/1800` trả về `404`?** | Dùng `WebApplicationFactory` + `client.GetAsync()` + `Assert.Equal(404, response.StatusCode)` |
+
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **Nếu `GetById(int id)` và `GetBooksByYear(int year)` đều dùng `{id:int}`, làm sao phân biệt?** | Dùng route khác: `[HttpGet("{id:int}")]`, `[HttpGet("year/{year:year}")]` |
+| **Làm sao để `GetBooksByYear` trả về `200` với danh sách rỗng nếu không có sách, thay vì `404`?** | Dùng `Ok(books)` — `404` chỉ khi route không hợp lệ |
 
 ---
 
