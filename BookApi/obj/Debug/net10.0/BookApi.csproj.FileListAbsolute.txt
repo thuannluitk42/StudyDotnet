@@ -7,8 +7,15 @@ D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\BookApi.runtimeconfig
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\BookApi.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\BookApi.pdb
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\BookApi.xml
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\FluentValidation.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\FluentValidation.AspNetCore.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.AspNetCore.JsonPatch.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.OpenApi.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Newtonsoft.Json.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Newtonsoft.Json.Bson.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.Api.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.Api.ProviderBuilderExtensions.dll

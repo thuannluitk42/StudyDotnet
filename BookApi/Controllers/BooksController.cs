@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BookApi.Binders;
 using BookApi.Models;
+using BookApi.Models.Dto;
 using BookApi.Services;
-using ILogger = BookApi.Services.ILogger;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BookApi.Controllers;
 
@@ -10,59 +11,91 @@ namespace BookApi.Controllers;
 public class BooksController : ControllerBase
 {
 	private readonly IBookService _bookService;
-	private readonly ILogger _logger;
 
-	public BooksController(IBookService bookService, ILogger logger)
+	public BooksController(IBookService bookService)
 	{
 		_bookService = bookService;
-		_logger = logger;
 	}
 
+	// === CREATE ===
+	[HttpPost]
+	public async Task<IActionResult> Create([FromBody] BookForCreationDto dto)
+	{
+		var validationResult = await _bookService.ValidateBookForCreationAsync(dto);
+		if (!validationResult.IsValid)
+		{
+			return ValidationProblem(); // TỰ ĐỘNG
+		}
+
+		var book = new Book
+		{
+			Id = await _bookService.GetNextIdAsync(),
+			Title = dto.Title,
+			Author = dto.Author,
+			PublishedYear = dto.PublishedYear
+		};
+
+		await _bookService.AddBookAsync(book);
+		return CreatedAtAction(nameof(Get), new { id = book.Id }, book);
+	}
+
+	// === READ: Get by ID ===
+	[HttpGet("{id:int}")]
+	public async Task<IActionResult> Get(int id)
+	{
+		var book = await _bookService.GetBookByIdAsync(id);
+		return book == null ? NotFound() : Ok(book);
+	}
+
+	// === READ: Get all ===
 	[HttpGet]
 	public async Task<ActionResult<List<Book>>> GetAll()
 		=> Ok(await _bookService.GetAllBooksAsync());
 
-	[HttpGet("{id}")]
-	public async Task<ActionResult<Book>> Get(int id)
+	// === READ: Get by Year (Custom Route Constraint) ===
+	[HttpGet("year/{year:year}")]
+	public async Task<IActionResult> GetBooksByYear(int year)
 	{
-		var book = await _bookService.GetBookByIdAsync(id);
-		return book is null ? NotFound() : Ok(book);
+		var books = await _bookService.GetBooksByYearAsync(year);
+		return Ok(books);
 	}
 
-	[HttpPost]
-	public async Task<ActionResult<Book>> Create(Book book)
+	// === UPDATE ===
+	[HttpPut("{id:int}")]
+	public async Task<IActionResult> Update(int id, [FromBody] BookForUpdateDto dto)
 	{
-		_logger.Log($"Adding book: {book.Title}");
-		var created = await _bookService.AddBookAsync(book);
-		return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
-	}
+		var validationResult = await _bookService.ValidateBookForUpdateAsync(dto);
+		if (!validationResult.IsValid)
+		{
+			return ValidationProblem(); // TỰ ĐỘNG
+		}
 
-	[HttpPut("{id}")]
-	public async Task<IActionResult> Update(int id, Book book)
-	{
-		if (id != book.Id) return BadRequest();
-		await _bookService.UpdateBookAsync(book);
+		var existing = await _bookService.GetBookByIdAsync(id);
+		if (existing == null) return NotFound();
+
+		if (dto.Title != null) existing.Title = dto.Title;
+		if (dto.Author != null) existing.Author = dto.Author;
+		if (dto.PublishedYear.HasValue) existing.PublishedYear = dto.PublishedYear.Value;
+
+		await _bookService.UpdateBookAsync(existing);
 		return NoContent();
 	}
 
-	[HttpDelete("{id}")]
+	// === DELETE ===
+	[HttpDelete("{id:int}")]
 	public async Task<IActionResult> Delete(int id)
 	{
+		var book = await _bookService.GetBookByIdAsync(id);
+		if (book == null) return NotFound();
+
 		await _bookService.DeleteBookAsync(id);
 		return NoContent();
 	}
 
-	[HttpGet("{id:int}")]
-	public IActionResult GetById(int id)
+	// === CUSTOM MODEL BINDER: Test Date Parsing ===
+	[HttpGet("by-date")]
+	public IActionResult GetByDate([ModelBinder(BinderType = typeof(CustomDateBinder))] DateTime date)
 	{
-		var book = _bookService.GetById(id);
-		return book is null ? NotFound() : Ok(book);
-	}
-
-	[HttpGet("year/{year:year}")]
-	public IActionResult GetBooksByYear(int year)
-	{
-		var books = _bookService.GetBooksByYear(year);
-		return Ok(books);
+		return Ok($"Selected date: {date:yyyy-MM-dd}");
 	}
 }

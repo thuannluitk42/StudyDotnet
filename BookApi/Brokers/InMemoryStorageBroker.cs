@@ -7,41 +7,42 @@ public class InMemoryStorageBroker : IStorageBroker
 	private readonly List<Book> _books = new();
 	private int _nextId = 1;
 
-	public Task<List<Book>> GetAllBooksAsync() => Task.FromResult(_books);
-
-	public Task<Book?> GetBookByIdAsync(int id) =>
-		Task.FromResult(_books.FirstOrDefault(b => b.Id == id));
-
-	public Task<Book> AddBookAsync(Book book)
+	public async Task AddBookAsync(Book book)
 	{
 		book.Id = _nextId++;
 		_books.Add(book);
-		return Task.FromResult(book);
+		await Task.CompletedTask;
 	}
 
-	public Task UpdateBookAsync(Book book)
+	public async Task<Book?> GetBookByIdAsync(int id)
+		=> await Task.FromResult(_books.FirstOrDefault(b => b.Id == id));
+
+	// ĐÃ THÊM: GetBooksByYearAsync
+	public async Task<List<Book>> GetBooksByYearAsync(int year)
+		=> await Task.FromResult(_books.Where(b => b.PublishedYear == year).ToList());
+
+	public async Task<List<Book>> GetAllBooksAsync()
+		=> await Task.FromResult(_books.ToList());
+
+	public async Task UpdateBookAsync(Book book)
 	{
 		var existing = _books.FirstOrDefault(b => b.Id == book.Id);
 		if (existing != null)
 		{
 			existing.Title = book.Title;
 			existing.Author = book.Author;
-			existing.PublishedDate = book.PublishedDate;
+			existing.PublishedYear = book.PublishedYear;
 		}
-		return Task.CompletedTask;
+		await Task.CompletedTask;
 	}
 
-	public Task DeleteBookAsync(int id)
+	public async Task DeleteBookAsync(int id)
 	{
 		var book = _books.FirstOrDefault(b => b.Id == id);
 		if (book != null) _books.Remove(book);
-		return Task.CompletedTask;
+		await Task.CompletedTask;
 	}
 
-	public Book? GetById(int id) => _books.FirstOrDefault(b => b.Id == id);
-
-	public List<Book> GetBooksByYear(int year)
-	{
-		return _books.Where(b => b.PublishedYear == year).ToList();
-	}
+	public async Task<int> GetNextIdAsync()
+		=> await Task.FromResult(_nextId);
 }

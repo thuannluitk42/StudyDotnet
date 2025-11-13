@@ -1,22 +1,35 @@
-﻿using System.Reflection;
+﻿// Program.cs
+using System.Reflection;
+using BookApi.Binders;
 using BookApi.Brokers;
 using BookApi.Constraints;
 using BookApi.Extensions;
 using BookApi.Middleware;
 using BookApi.Models;
 using BookApi.Services;
+using BookApi.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DI: THE STANDARD (Ch3.7)
+// === DI: THE STANDARD (Ch3.7) ===
 builder.Services.AddSingleton<IStorageBroker, InMemoryStorageBroker>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddTransient<BookApi.Services.ILogger, ConsoleLogger>();
 
-// MVC + Swagger
-builder.Services.AddControllers();
+// === FluentValidation: TÁCH RIÊNG ===
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<BookForCreationDtoValidator>();
+
+// === MVC + NewtonsoftJson ===
+builder.Services.AddControllers()
+	.AddNewtonsoftJson();
+
+// === Swagger + XML Comments ===
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -24,35 +37,39 @@ builder.Services.AddSwaggerGen(c =>
 	{
 		Title = "Book API (.NET 10 RC2)",
 		Version = "v1",
-		Description = "Ch4: Pipeline + Custom Middleware"
+		Description = "Mastering ASP.NET Core 10 — Mabrouk Mahdhi"
 	});
 
-	// XML Comments: Ch12.7 p.297 → HOÀN HẢO
 	var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 	var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-	c.IncludeXmlComments(xmlPath);
+	if (File.Exists(xmlPath))
+		c.IncludeXmlComments(xmlPath);
 });
 
+// === .NET 10 DI Diagnostics ===
 if (builder.Environment.IsDevelopment())
 {
-	builder.Services.AddDiagnostics(); // ← MỚI TRONG .NET 10
+	builder.Services.AddDiagnostics();
 }
 
-// CORS: Chuẩn bị cho Blazor (Ch19) → TUYỆT VỜI
+// === CORS ===
 builder.Services.AddCors(options =>
 {
 	options.AddDefaultPolicy(policy =>
-		policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+		policy.AllowAnyOrigin()
+			  .AllowAnyHeader()
+			  .AllowAnyMethod());
 });
 
+// === Custom Route Constraint ===
 builder.Services.Configure<RouteOptions>(options =>
 {
-	options.ConstraintMap.Add("year", typeof(YearRouteConstraint));
+	options.ConstraintMap["year"] = typeof(YearRouteConstraint);
 });
 
 var app = builder.Build();
 
-// Development: Swagger UI
+// === Pipeline ===
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
@@ -60,21 +77,29 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRequestTiming();     // ← Custom middleware của bạn
+app.UseRequestTiming();
 app.UseCors();
-app.MapControllers();
 
 app.UseExceptionHandler(errorApp =>
 {
 	errorApp.Run(async context =>
 	{
 		context.Response.StatusCode = 500;
-		await context.Response.WriteAsync("Something went wrong!");
+		await context.Response.WriteAsync("Something went wrong! Please try again later.");
 	});
 });
 
+app.MapControllers();
+
+// === Minimal API ===
 app.MapGet("/hello", () => "Hello from Minimal API!");
+
 app.MapPost("/echo", (Book book) => Results.Ok(book))
    .WithName("EchoBook");
+
+app.MapGet("/api/books/by-date",
+	([ModelBinder(BinderType = typeof(CustomDateBinder))] DateTime date) =>
+		Results.Ok($"Selected date: {date:yyyy-MM-dd}"))
+   .WithName("GetByDate");
 
 app.Run();

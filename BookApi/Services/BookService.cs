@@ -1,50 +1,54 @@
 ﻿using BookApi.Brokers;
 using BookApi.Models;
+using BookApi.Models.Dto;
+using BookApi.Validators;
+using FluentValidation.Results;
 
 namespace BookApi.Services;
 
 public class BookService : IBookService
 {
-	private readonly IStorageBroker _storageBroker;
+	private readonly IStorageBroker _storage;
 
-	public BookService(IStorageBroker storageBroker)
+	public BookService(IStorageBroker storage)
 	{
-		_storageBroker = storageBroker;
+		_storage = storage;
 	}
 
-	public async Task<List<Book>> GetAllBooksAsync() =>
-		await _storageBroker.GetAllBooksAsync();
+	// === CRUD ===
+	public async Task AddBookAsync(Book book)
+		=> await _storage.AddBookAsync(book);
 
-	public async Task<Book?> GetBookByIdAsync(int id) =>
-		await _storageBroker.GetBookByIdAsync(id);
+	public async Task<Book?> GetBookByIdAsync(int id)
+		=> await _storage.GetBookByIdAsync(id);
 
-	public async Task<Book> AddBookAsync(Book book)
+	public async Task<List<Book>> GetAllBooksAsync()
+		=> await _storage.GetAllBooksAsync();
+
+	public async Task UpdateBookAsync(Book book)
+		=> await _storage.UpdateBookAsync(book);
+
+	public async Task DeleteBookAsync(int id)
+		=> await _storage.DeleteBookAsync(id);
+
+	public async Task<int> GetNextIdAsync()
+		=> await _storage.GetNextIdAsync();
+
+	public async Task<List<Book>> GetBooksByYearAsync(int year)
+		=> await _storage.GetBooksByYearAsync(year);
+
+	// === VALIDATION: Mabrouk’s Pattern ===
+	public async Task<ValidationResult> ValidateBookForCreationAsync(BookForCreationDto dto)
 	{
-		if (string.IsNullOrWhiteSpace(book.Title))
-			throw new ArgumentException("Title is required.");
-
-		return await _storageBroker.AddBookAsync(book);
+		var validator = new BookForCreationDtoValidator();
+		var result = await validator.ValidateAsync(dto);
+		return result;
 	}
 
-	public async Task<Book> UpdateBookAsync(Book book)
+	public async Task<ValidationResult> ValidateBookForUpdateAsync(BookForUpdateDto dto)
 	{
-		if (string.IsNullOrWhiteSpace(book.Title))
-			throw new ArgumentException("Title is required.");
-
-		await _storageBroker.UpdateBookAsync(book);
-		return book;
-	}
-
-	public async Task DeleteBookAsync(int id) =>
-		await _storageBroker.DeleteBookAsync(id);
-
-	public Book? GetById(int id)
-	{
-		return _storageBroker.GetById(id);
-	}
-
-	public List<Book> GetBooksByYear(int year)
-	{
-		return _storageBroker.GetBooksByYear(year);
+		var validator = new BookForUpdateDtoValidator();
+		var result = await validator.ValidateAsync(dto);
+		return result;
 	}
 }
