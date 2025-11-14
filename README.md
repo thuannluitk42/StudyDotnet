@@ -125,21 +125,41 @@
 
 ---
 
-## Bằng chứng thực tế (GitHub)
+### **DAY 6: — CHƯƠNG 9: AUTHENTICATION & AUTHORIZATION**
 
-**Repository**: [https://github.com/thuannluitk42/StudyDotnet](https://github.com/thuannluitk42/StudyDotnet)
+| Câu hỏi | Trả lời |
+|--------|--------|
+| **JWT là gì??** | JSON Web Token — chuỗi mã hóa gồm Header, Payload, Signature. Dùng để xác thực stateless. |
+| **Luồng JWT hoạt động thế nào??** | Client → Login → Server tạo token → Client lưu → Gọi API với Bearer <token> → Middleware validate → Cho phép. |
+| **Tại sao không dùng Session??** | Stateless, scale tốt, không cần server lưu trạng thái. |
+| **Claims dùng để làm gì??** | Lưu thông tin user: sub, email, role, name → Dùng cho [Authorize(Roles = "Admin")] |
+| **Token hết hạn thì sao??** | 401 Unauthorized → Client gọi "/refresh" để lấy token mới. |
+| **Làm sao bảo vệ API??** | Dùng [Authorize] + AddAuthentication("Bearer").AddJwtBearer(). |
+| **Validate token ở đâu??** | Middleware → JwtBearer → TokenValidationParameters |
+| **Key bí mật để làm gì??** | Ký token (SigningCredentials) → Server validate chữ ký. |
+| **Refresh Token khác gì Access Token??** | Access: ngắn hạn (60p), Refresh: dài hạn (7 ngày), dùng để cấp lại Access. |
+| **Tại sao không lưu password trong code???** | Dùng Identity + Hashing (PBKDF2) → Không bao giờ lưu plain text. |
 
-| File | Mục đích |
-|------|--------|
-| `BooksController.cs` | Full CRUD + Async |
-| `YearRouteConstraint.cs` | Custom constraint |
-| `ApiIntegrationTests.cs` | Test toàn bộ pipeline |
-| `Book.cs` | Có `PublishedYear` |
+## Luồng hoạt động — JWT Authentication (Mabrouk’s Pattern)
 
+```mermaid
+flowchart TD
+    A[CLIENT] -->|POST /api/auth/login| B[AuthController.Login()]
+    B --> C[IAuthService.LoginAsync()]
+    C --> D{Validate Email + Password}
+    D -->|Fail| E[throw UnauthorizedAccessException]
+    D -->|Success| F[Generate JWT Token]
+    F --> G[Claims: sub, email, role]
+    G --> H[JwtSecurityToken + SigningCredentials]
+    H --> I[WriteToken → string]
+    I --> J[Response: 200 + { token, expires }]
+    
+    J --> K[CLIENT lưu token]
+    K --> L[Gọi API với Header: Authorization: Bearer <token>]
+    L --> M[Middleware: JwtBearer]
+    M --> N[Validate: Issuer, Audience, Lifetime, SigningKey]
+    N -->|Fail| O[401 Unauthorized]
+    N -->|Success| P[[Authorize] → Gọi API được bảo vệ]
+    P --> Q[200 OK + Data]
+	```
 ---
-
-**Ngày 5 (7 PM HCMC)**:  
-> **Chương 8: Model Binding & Validation**  
-> - `[FromBody]`, `[FromQuery]`  
-> - FluentValidation  
-> - Custom Model Binder
