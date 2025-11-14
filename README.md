@@ -138,3 +138,22 @@ flowchart TD
     N -->|Fail| O["401 Unauthorized"]
     N -->|Success| P["[Authorize] → Gọi API được bảo vệ"]
     P --> Q["200 OK + Data"]
+```
+---
+## Test API — Swagger vs `.http`
+
+> **"Bạn không cần Swagger để test API — bạn chỉ cần một file `.http`."**  
+> — *Mastering ASP.NET Core 10*, **p.298**
+
+| Tiêu chí | Swagger | `BookApi.http` |
+|--------|--------|----------------|
+| **Tốc độ** | Chậm (mở browser) | **Siêu nhanh** (trong IDE) |
+| **Debug** | Khó xem raw | **Dễ thấy header/body** |
+| **Chia sẻ** | Cần URL | **Commit vào Git** |
+| **Biến môi trường** | Không | **Có** (`@host`, `@token`) |
+| **Dùng khi app chưa chạy** | Không | **Có (mock)** |
+| **Tự động lưu token** | Không | **Có** (`client.global.set`) |
+
+```http
+POST {{host}}/api/auth/login → 200 + token
+GET {{host}}/api/books/admin → 200 (có token) / 401 (không)
