@@ -1,6 +1,93 @@
-@BookApi_HostAddress = http://localhost:5238
+# ========================================
+# BookApi.http — Fast API Testing
+# ========================================
 
-GET {{BookApi_HostAddress}}/weatherforecast/
+@BookApi_HostAddress = https://localhost:7001
+@BookApi_AdminEmail = studydotnet@yopmail.com
+@BookApi_AdminPassword = Abc12345@
+
+# ========================================
+# 1. LOGIN → LẤY JWT TOKEN
+# ========================================
+POST {{BookApi_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{BookApi_AdminEmail}}",
+  "password": "{{BookApi_AdminPassword}}"
+}
+
+> {%
+    client.global.set("jwt_token", response.body.token);
+    client.global.set("token_expires", response.body.expires);
+%}
+
+###
+
+# ========================================
+# 2. GET ALL BOOKS
+# ========================================
+GET {{BookApi_HostAddress}}/api/books
 Accept: application/json
+
+###
+
+# ========================================
+# 3. CREATE NEW BOOK
+# ========================================
+POST {{BookApi_HostAddress}}/api/books
+Content-Type: application/json
+
+{
+  "title": "Refactoring",
+  "author": "Martin Fowler",
+  "publishedYear": 1999
+}
+
+###
+
+# ========================================
+# 4. GET BOOK BY ID
+# ========================================
+GET {{BookApi_HostAddress}}/api/books/1
+Accept: application/json
+
+###
+
+# ========================================
+# 5. ADMIN ENDPOINT — PROTECTED
+# ========================================
+GET {{BookApi_HostAddress}}/api/books/admin
+Authorization: Bearer {{jwt_token}}
+Accept: application/json
+
+###
+
+# ========================================
+# 6. CUSTOM MODEL BINDER — dd-MM-yyyy
+# ========================================
+GET {{BookApi_HostAddress}}/api/books/by-date?date=25-12-2025
+Accept: application/json
+
+###
+
+# ========================================
+# 7. MINIMAL API — ECHO
+# ========================================
+POST {{BookApi_HostAddress}}/echo
+Content-Type: application/json
+
+{
+  "title": "Echo Test",
+  "author": "You"
+}
+
+###
+
+# ========================================
+# 8. HEALTH CHECK
+# ========================================
+GET {{BookApi_HostAddress}}/hello
+Accept: text/plain
 
 ###

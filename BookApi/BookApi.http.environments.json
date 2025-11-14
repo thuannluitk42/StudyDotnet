@@ -1,0 +1,13 @@
+{
+  "default": {
+    "BookApi_HostAddress": "https://localhost:7001",
+    "BookApi_AdminEmail": "studydotnet@yopmail.com",
+    "BookApi_AdminPassword": "Abc12345@"
+  },
+  "local": {
+    "BookApi_HostAddress": "https://localhost:7001"
+  },
+  "staging": {
+    "BookApi_HostAddress": "https://api-staging.book.com"
+  }
+}
