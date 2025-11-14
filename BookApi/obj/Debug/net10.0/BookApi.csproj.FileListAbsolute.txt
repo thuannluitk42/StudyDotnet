@@ -10,9 +10,16 @@ D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\BookApi.xml
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\FluentValidation.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\FluentValidation.AspNetCore.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.AspNetCore.JsonPatch.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.OpenApi.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Newtonsoft.Json.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Newtonsoft.Json.Bson.dll
@@ -26,6 +33,7 @@ D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\OpenTelemetry.Instrum
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.csproj.AssemblyReference.cache
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\rpswa.dswa.cache.json
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.GeneratedMSBuildEditorConfig.editorconfig

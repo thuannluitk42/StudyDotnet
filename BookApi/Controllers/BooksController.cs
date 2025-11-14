@@ -2,6 +2,7 @@
 using BookApi.Models;
 using BookApi.Models.Dto;
 using BookApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookApi.Controllers;
@@ -98,4 +99,8 @@ public class BooksController : ControllerBase
 	{
 		return Ok($"Selected date: {date:yyyy-MM-dd}");
 	}
+
+	[HttpGet("admin")]
+	[Authorize(Roles = "Admin")]
+	public IActionResult AdminOnly() => Ok("Welcome, Admin!");
 }

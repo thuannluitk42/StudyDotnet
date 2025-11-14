@@ -1,5 +1,6 @@
 ﻿// Program.cs
 using System.Reflection;
+using System.Text;
 using BookApi.Binders;
 using BookApi.Brokers;
 using BookApi.Constraints;
@@ -11,6 +12,7 @@ using BookApi.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,27 @@ builder.Services.AddTransient<BookApi.Services.ILogger, ConsoleLogger>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<BookForCreationDtoValidator>();
+
+// === JWT Authentication ===
+builder.Services.AddAuthentication("Bearer")
+	.AddJwtBearer("Bearer", options =>
+	{
+		options.TokenValidationParameters = new()
+		{
+			ValidateIssuer = true,
+			ValidateAudience = true,
+			ValidateLifetime = true,
+			ValidateIssuerSigningKey = true,
+			ValidIssuer = builder.Configuration["Jwt:Issuer"],
+			ValidAudience = builder.Configuration["Jwt:Audience"],
+			IssuerSigningKey = new SymmetricSecurityKey(
+				Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+		};
+	});
+
+builder.Services.AddAuthorization();
+// === DI ===
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // === MVC + NewtonsoftJson ===
 builder.Services.AddControllers()
