@@ -193,3 +193,44 @@ flowchart TD
 ```
 ---
 
+## Luồng Refresh Token + Identity (Mabrouk’s Security Pattern)
+
+```mermaid
+flowchart TD
+    A["[CLIENT]"] -->|"POST /api/auth/login"| B["[1. Identity]"]
+    B --> C["UserManager.FindByEmailAsync"]
+    C --> D["CheckPasswordAsync"]
+    
+    D -->|Success| E["[2. Generate]"]
+    E --> F["Access Token (60 phút)"]
+    E --> G["Refresh Token (7 ngày)"]
+    
+    E --> H["[3. Response]"]
+    H --> I["{ accessToken, expiresIn }"]
+    H --> J["HttpOnly Cookie: refreshToken"]
+    
+    I --> K["[CLIENT]"]
+    K -->|Gọi API| L["Bearer Access Token"]
+    
+    L -->|Hết hạn| M["401 Unauthorized"]
+    M --> N["Gọi POST /api/auth/refresh"]
+    
+    N --> O["[5. Validate]"]
+    O --> P["Lấy Refresh Token từ Cookie"]
+    O --> Q["DB Check: Token hợp lệ?"]
+    
+    Q -->|Yes| R["Cấp mới Access + Refresh"]
+    R --> S["Revoke cũ, lưu mới vào DB"]
+    R --> T["Trả Access Token + Cookie mới"]
+    
+    Q -->|No| U["401 Invalid Token"]
+
+    style A fill:#2196F3,stroke:#333,color:#fff
+    style B fill:#4CAF50,stroke:#333,color:#fff
+    style E fill:#FF9800,stroke:#333,color:#fff
+    style H fill:#9C27B0,stroke:#333,color:#fff
+    style O fill:#F44336,stroke:#333,color:#fff
+    style R fill:#8BC34A,stroke:#333,color:#fff
+
+```
+---
