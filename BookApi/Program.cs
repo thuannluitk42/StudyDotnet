@@ -1,6 +1,7 @@
-﻿// Program.cs
+﻿// System + Microsoft
 using System.Reflection;
 using System.Text;
+// Project namespaces
 using BookApi.Binders;
 using BookApi.Brokers;
 using BookApi.Constraints;
@@ -9,50 +10,52 @@ using BookApi.Middleware;
 using BookApi.Models;
 using BookApi.Services;
 using BookApi.Validators;
+// FluentValidation
 using FluentValidation;
 using FluentValidation.AspNetCore;
+// Microsoft Identity & OpenAPI
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// === DI: THE STANDARD (Ch3.7) ===
+// === 1. THE STANDARD DI (Ch3.7) ===
 builder.Services.AddSingleton<IStorageBroker, InMemoryStorageBroker>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddTransient<BookApi.Services.ILogger, ConsoleLogger>();
 
-// === FluentValidation: TÁCH RIÊNG ===
+// === 2. FLUENTVALIDATION ===
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<BookForCreationDtoValidator>();
 
-// === JWT Authentication ===
+// === 3. JWT AUTHENTICATION & AUTHORIZATION ===
 builder.Services.AddAuthentication("Bearer")
 	.AddJwtBearer("Bearer", options =>
 	{
-		options.TokenValidationParameters = new()
+		options.TokenValidationParameters = new TokenValidationParameters
 		{
 			ValidateIssuer = true,
 			ValidateAudience = true,
 			ValidateLifetime = true,
 			ValidateIssuerSigningKey = true,
 			ValidIssuer = builder.Configuration["Jwt:Issuer"],
-			ValidAudience = builder.Configuration["Jwt:Audience"],
+			ValidAudience = builder.Configuration["Jwt:Audienc"],
 			IssuerSigningKey = new SymmetricSecurityKey(
 				Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
 		};
 	});
-
 builder.Services.AddAuthorization();
-// === DI ===
+
+// === 4. AUTH SERVICE DI ===
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// === MVC + NewtonsoftJson ===
+// === 5. MVC + JSON ===
 builder.Services.AddControllers()
 	.AddNewtonsoftJson();
 
-// === Swagger + XML Comments ===
+// === 6. SWAGGER + XML COMMENTS ===
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -69,13 +72,13 @@ builder.Services.AddSwaggerGen(c =>
 		c.IncludeXmlComments(xmlPath);
 });
 
-// === .NET 10 DI Diagnostics ===
+// === 7. .NET 10 DI DIAGNOSTICS (DEV ONLY) ===
 if (builder.Environment.IsDevelopment())
 {
 	builder.Services.AddDiagnostics();
 }
 
-// === CORS ===
+// === 8. CORS ===
 builder.Services.AddCors(options =>
 {
 	options.AddDefaultPolicy(policy =>
@@ -84,7 +87,7 @@ builder.Services.AddCors(options =>
 			  .AllowAnyMethod());
 });
 
-// === Custom Route Constraint ===
+// === 9. CUSTOM ROUTE CONSTRAINT ===
 builder.Services.Configure<RouteOptions>(options =>
 {
 	options.ConstraintMap["year"] = typeof(YearRouteConstraint);
@@ -92,17 +95,21 @@ builder.Services.Configure<RouteOptions>(options =>
 
 var app = builder.Build();
 
-// === Pipeline ===
+// === DEVELOPMENT ONLY ===
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.UseRequestTiming();
-app.UseCors();
+// === SECURITY & MIDDLEWARE ===
+app.UseHttpsRedirection();     // 1. HTTPS
+app.UseRequestTiming();        // 2. Timing
+app.UseCors();                 // 3. CORS
+app.UseAuthentication();       // 4. AuthN
+app.UseAuthorization();        // 5. AuthZ
 
+// === GLOBAL EXCEPTION HANDLER ===
 app.UseExceptionHandler(errorApp =>
 {
 	errorApp.Run(async context =>
@@ -112,9 +119,10 @@ app.UseExceptionHandler(errorApp =>
 	});
 });
 
+// === ENDPOINTS ===
 app.MapControllers();
 
-// === Minimal API ===
+// === MINIMAL API ===
 app.MapGet("/hello", () => "Hello from Minimal API!");
 
 app.MapPost("/echo", (Book book) => Results.Ok(book))
