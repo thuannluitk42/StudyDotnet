@@ -17,7 +17,7 @@ namespace BookApi.Services
 
 		public async Task<string> LoginAsync(LoginDto dto)
 		{
-			if (dto.Email != "studydotnet@yopmail.com" || dto.Password != "Abc12345@")
+			if (dto.Email != "studydotnet@yopmail.com" || dto.Password != "Abc12345@") 
 				throw new UnauthorizedAccessException("Invalid credentials");
 
 			var claims = new[]
