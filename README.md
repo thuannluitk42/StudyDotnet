@@ -144,22 +144,22 @@
 
 ```mermaid
 flowchart TD
-    A[CLIENT] -->|POST /api/auth/login| B[AuthController.Login()]
-    B --> C[IAuthService.LoginAsync()]
-    C --> D{Validate Email + Password}
-    D -->|Fail| E[throw UnauthorizedAccessException]
-    D -->|Success| F[Generate JWT Token]
-    F --> G[Claims: sub, email, role]
-    G --> H[JwtSecurityToken + SigningCredentials]
-    H --> I[WriteToken → string]
-    I --> J[Response: 200 + { token, expires }]
+    A["CLIENT"] -->|"POST /api/auth/login"| B["AuthController.Login()"]
+    B --> C["IAuthService.LoginAsync()"]
+    C --> D{{"Validate Email + Password"}}
+    D -->|Fail| E["throw UnauthorizedAccessException"]
+    D -->|Success| F["Generate JWT Token"]
+    F --> G["Claims: sub, email, role"]
+    G --> H["JwtSecurityToken + SigningCredentials"]
+    H --> I["WriteToken → string"]
+    I --> J["Response: 200 + { token, expires }"]
     
-    J --> K[CLIENT lưu token]
-    K --> L[Gọi API với Header: Authorization: Bearer <token>]
-    L --> M[Middleware: JwtBearer]
-    M --> N[Validate: Issuer, Audience, Lifetime, SigningKey]
-    N -->|Fail| O[401 Unauthorized]
-    N -->|Success| P[[Authorize] → Gọi API được bảo vệ]
-    P --> Q[200 OK + Data]
+    J --> K["CLIENT lưu token"]
+    K --> L["Gọi API với Header: Authorization: Bearer <token>"]
+    L --> M["Middleware: JwtBearer"]
+    M --> N["Validate: Issuer, Audience, Lifetime, SigningKey"]
+    N -->|Fail| O["401 Unauthorized"]
+    N -->|Success| P["[Authorize] → Gọi API được bảo vệ"]
+    P --> Q["200 OK + Data"]
 	```
 ---
