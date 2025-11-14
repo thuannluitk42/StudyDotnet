@@ -12,6 +12,7 @@
 | **Day 4** | **Ch7** | **Routing & Endpoints** | - Full CRUD Async Controller<br>- Attribute Routing: `{id:int}`<br>- Custom Route Constraint: `year/{year:year}` → `1800` → `404`<br>- Minimal API: `MapGet("/hello")`<br>- `GetBooksByYear` full The Standard<br>- Integration Tests: `GET /api/books/1`, `GET /api/books/year/1800` |
 | **Day 5** | **Ch8** | **Model Binding & Validation** | FluentValidation, Custom Binder, `ValidationProblem()` |
 | **Day 6** | **Ch9** | **Authentication & Authorization** | JWT, `[Authorize]`, `401 → 200` |
+| **Day 7** | **Ch10** | **Refresh Token + Identity** | SQLite, HttpOnly Cookie, Revoke, SeedData |
 
 ---
 
@@ -195,6 +196,8 @@ flowchart TD
 
 ## Luồng Refresh Token + Identity (Mabrouk’s Security Pattern)
 
+## Luồng Refresh Token + Identity (Mabrouk’s Security Pattern)
+
 ```mermaid
 flowchart TD
     A["[CLIENT]"] -->|"POST /api/auth/login"| B["[1. Identity]"]
@@ -233,4 +236,31 @@ flowchart TD
     style R fill:#8BC34A,stroke:#333,color:#fff
 
 ```
+---
+
+## Overview Kiến Thức — The Standard (Mabrouk Mahdhi)
+
+| Chủ đề | Kiến thức cốt lõi | Tại sao quan trọng? |
+|-------|------------------|---------------------|
+| **Broker → Service → Controller** | Phân tầng rõ ràng | Dễ test, dễ maintain |
+| **Dependency Injection** | `Singleton`, `Scoped`, `Transient` | Kiểm soát tuổi thọ object |
+| **Middleware Pipeline** | `UseHttpsRedirection` → `UseAuthentication` → `UseAuthorization` | Bảo mật đúng thứ tự |
+| **FluentValidation** | Tách riêng validator | Không nhầm lẫn với model |
+| **JWT + Refresh Token** | Access (60p) + Refresh (7 ngày) | Bảo mật, chống replay |
+| **ASP.NET Core Identity** | `UserManager`, `SignInManager` | Quản lý user chuyên nghiệp |
+| **HttpOnly Cookie** | Lưu Refresh Token | Chống XSS |
+| **SeedData** | Tạo user tự động | `bookapi.db` có dữ liệu ngay |
+
+---
+
+| Câu hỏi | Trả lời ngắn gọn | Trả lời chi tiết |
+|--------|------------------|------------------|
+| **DI Scoped dùng khi nào?** | Mỗi HTTP request | `DbContext`, `User` |
+| **Refresh Token lưu ở đâu?** | DB + HttpOnly Cookie | Không trong JWT → chống replay |
+| **Làm sao test API nhanh?** | Dùng `.http` file | Không cần Swagger |
+| **Tại sao `UseAuthentication` trước `UseAuthorization`?** | Xác thực → mới phân quyền | Middleware pipeline |
+| **Làm sao có user trong `bookapi.db`?** | `SeedData` hoặc `/register` | Tự động tạo `admin@book.com` |
+| **Custom Binder dùng để làm gì?** | Parse `dd-MM-yyyy` → `DateTime` | Không cần `[FromQuery]` |
+| **Làm sao revoke Refresh Token?** | `IsRevoked = true` | Cấp mới, xóa cũ |
+
 ---

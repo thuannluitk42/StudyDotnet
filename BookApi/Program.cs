@@ -1,22 +1,30 @@
 ﻿// System + Microsoft
 using System.Reflection;
 using System.Text;
+
+// Microsoft ASP.NET Core
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+
+// OpenAPI + Swagger
+using Microsoft.OpenApi;
+
+// FluentValidation
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
 // Project namespaces
 using BookApi.Binders;
 using BookApi.Brokers;
 using BookApi.Constraints;
+using BookApi.Data;
 using BookApi.Extensions;
 using BookApi.Middleware;
 using BookApi.Models;
 using BookApi.Services;
 using BookApi.Validators;
-// FluentValidation
-using FluentValidation;
-using FluentValidation.AspNetCore;
-// Microsoft Identity & OpenAPI
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,12 +33,26 @@ builder.Services.AddSingleton<IStorageBroker, InMemoryStorageBroker>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddTransient<BookApi.Services.ILogger, ConsoleLogger>();
 
-// === 2. FLUENTVALIDATION ===
+// === 2. DATABASE + IDENTITY ===
+builder.Services.AddDbContext<AppDbContext>(options =>
+	options.UseSqlite("Data Source=bookapi.db"));
+
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+	.AddEntityFrameworkStores<AppDbContext>()
+	.AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+	options.Password.RequireDigit = true;
+	options.Password.RequiredLength = 6;
+});
+
+// === 3. FLUENTVALIDATION ===
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<BookForCreationDtoValidator>();
 
-// === 3. JWT AUTHENTICATION & AUTHORIZATION ===
+// === 4. JWT AUTHENTICATION & AUTHORIZATION ===
 builder.Services.AddAuthentication("Bearer")
 	.AddJwtBearer("Bearer", options =>
 	{
@@ -41,21 +63,22 @@ builder.Services.AddAuthentication("Bearer")
 			ValidateLifetime = true,
 			ValidateIssuerSigningKey = true,
 			ValidIssuer = builder.Configuration["Jwt:Issuer"],
-			ValidAudience = builder.Configuration["Jwt:Audienc"],
+			ValidAudience = builder.Configuration["Jwt:Audience"],
 			IssuerSigningKey = new SymmetricSecurityKey(
 				Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
 		};
 	});
+
 builder.Services.AddAuthorization();
 
-// === 4. AUTH SERVICE DI ===
+// === 5. AUTH SERVICE DI ===
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// === 5. MVC + JSON ===
+// === 6. MVC + JSON ===
 builder.Services.AddControllers()
 	.AddNewtonsoftJson();
 
-// === 6. SWAGGER + XML COMMENTS ===
+// === 7. SWAGGER + XML COMMENTS ===
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -72,13 +95,13 @@ builder.Services.AddSwaggerGen(c =>
 		c.IncludeXmlComments(xmlPath);
 });
 
-// === 7. .NET 10 DI DIAGNOSTICS (DEV ONLY) ===
+// === 8. .NET 10 DI DIAGNOSTICS (DEV ONLY) ===
 if (builder.Environment.IsDevelopment())
 {
 	builder.Services.AddDiagnostics();
 }
 
-// === 8. CORS ===
+// === 9. CORS ===
 builder.Services.AddCors(options =>
 {
 	options.AddDefaultPolicy(policy =>
@@ -87,7 +110,7 @@ builder.Services.AddCors(options =>
 			  .AllowAnyMethod());
 });
 
-// === 9. CUSTOM ROUTE CONSTRAINT ===
+// === 10. CUSTOM ROUTE CONSTRAINT ===
 builder.Services.Configure<RouteOptions>(options =>
 {
 	options.ConstraintMap["year"] = typeof(YearRouteConstraint);
@@ -100,6 +123,14 @@ if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
 	app.UseSwaggerUI();
+
+	// Auto migrate
+	using var scope = app.Services.CreateScope();
+	var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+	db.Database.Migrate();
+
+	// TẠO USER + ROLE
+	await SeedData.InitializeAsync(scope.ServiceProvider);
 }
 
 // === SECURITY & MIDDLEWARE ===

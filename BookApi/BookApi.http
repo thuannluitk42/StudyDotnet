@@ -5,6 +5,7 @@
 @BookApi_HostAddress = https://localhost:7001
 @BookApi_AdminEmail = studydotnet@yopmail.com
 @BookApi_AdminPassword = Abc12345@
+@host = http://localhost:5238
 
 # ========================================
 # 1. LOGIN → LẤY JWT TOKEN
@@ -91,3 +92,35 @@ GET {{BookApi_HostAddress}}/hello
 Accept: text/plain
 
 ###
+
+### 1. LOGIN
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "studydotnet@yopmail.com",
+  "password": "Abc12345@"
+}
+
+> {%
+    client.global.set("access_token", response.body.accessToken);
+    client.global.set("refresh_token", response.body.refreshToken);
+%}
+
+### 2. REFRESH
+POST {{host}}/api/auth/refresh
+Content-Type: application/json
+Cookie: refreshToken={{refresh_token}}
+
+{
+  "refreshToken": "{{refresh_token}}"
+}
+
+> {%
+    client.global.set("access_token", response.body.accessToken);
+    client.global.set("refresh_token", response.body.refreshToken);
+%}
+
+### 3. CALL PROTECTED API
+GET {{host}}/api/books/admin
+Authorization: Bearer {{access_token}}

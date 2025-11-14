@@ -4,6 +4,8 @@ namespace BookApi.Services
 {
 	public interface IAuthService
 	{
-		Task<string> LoginAsync(LoginDto dto);
+		Task<AuthResponse> LoginAsync(LoginDto dto);
+		Task<AuthResponse> RefreshTokenAsync(string refreshToken);
+		Task LogoutAsync(string refreshToken);
 	}
 }
