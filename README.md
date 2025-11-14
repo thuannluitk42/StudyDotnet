@@ -161,6 +161,35 @@ flowchart TD
 ```http
 POST {{host}}/api/auth/login → 200 + token
 GET {{host}}/api/books/admin → 200 (có token) / 401 (không)
+```
+---
 
+## DI Lifetime — Singleton vs Scoped vs Transient
+
+> **"Singleton sống mãi, Scoped theo request, Transient mỗi lần một đời."**
+
+```mermaid
+flowchart TD
+    A["[App Start]"] --> B["[Singleton]"]
+    B -->|Tạo 1 lần| C["Dùng mãi mãi"]
+    
+    A --> D["[HTTP Request 1]"]
+    D --> E["[Scoped]"]
+    E -->|Dùng trong request| F["Hủy"]
+    
+    A --> G["[HTTP Request 2]"]
+    G --> H["[Scoped]"]
+    H -->|Dùng trong request| I["Hủy"]
+    
+    A --> J["[Inject nhiều lần]"]
+    J --> K["[Transient]"]
+    K -->|Tạo mới mỗi lần| L["Hủy ngay sau dùng"]
+    
+    style A fill:#f9d71c,stroke:#333,stroke-width:2px,color:#000
+    style B fill:#4CAF50,stroke:#333,color:#fff
+    style E fill:#2196F3,stroke:#333,color:#fff
+    style H fill:#2196F3,stroke:#333,color:#fff
+    style K fill:#FF5722,stroke:#333,color:#fff
+```
 ---
 
