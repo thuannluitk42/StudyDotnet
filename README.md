@@ -119,6 +119,10 @@
 
 ## Luồng hoạt động — JWT Authentication (Mabrouk’s Pattern)
 
+Authentication ở Service → IAuthService
+Authorization ở Middleware → JwtBearer
+Controller chỉ trả token hoặc gọi API
+
 ```mermaid
 flowchart TD
     A["CLIENT"] -->|"POST /api/auth/login"| B["AuthController.Login()"]
@@ -157,3 +161,6 @@ flowchart TD
 ```http
 POST {{host}}/api/auth/login → 200 + token
 GET {{host}}/api/books/admin → 200 (có token) / 401 (không)
+
+---
+
