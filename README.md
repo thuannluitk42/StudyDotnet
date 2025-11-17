@@ -265,6 +265,7 @@ flowchart TD
 
 ##Luồng Refresh Token + Identity
 
+```mermaid
 flowchart TD
     A["[CLIENT]"] -->|"POST /api/auth/login"| B["[1. Identity]"]
     B --> C["UserManager.FindByEmailAsync"]
