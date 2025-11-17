@@ -383,4 +383,43 @@ flowchart TD
 ```
 ---
 
+## MERMAID — RATE LIMITING FLOW
+
+```mermaid
+flowchart TD
+    A["[CLIENT]"] -->|"GET /api/books"| B["Middleware"]
+    B --> C["IpRateLimiting"]
+    C --> D{"< 100 req/phút?"}
+    D -->|Yes| E["200 OK"]
+    D -->|No| F["429 Too Many Requests"]
+    F --> G["Retry-After: 60s"]
+
+    style A fill:#2196F3,stroke:#333,color:#fff
+    style C fill:#FF9800,stroke:#333,color:#fff
+    style E fill:#8BC34A,stroke:#333,color:#fff
+    style F fill:#F44336,stroke:#333,color:#fff
+```
+
+---
+
+## MERMAID — HEALTH CHECKS FLOW
+
+```mermaid
+flowchart TD
+    A["[CLIENT]"] -->|"GET /health"| B["HealthChecks Middleware"]
+    B --> C["Check SQLite"]
+    C --> D["Check Memory"]
+    D --> E{"All Healthy?"}
+    E -->|Yes| F["200 Healthy"]
+    E -->|No| G["503 Unhealthy"]
+
+    style A fill:#2196F3,stroke:#333,color:#fff
+    style B fill:#4CAF50,stroke:#333,color:#fff
+    style F fill:#8BC34A,stroke:#333,color:#fff
+    style G fill:#F44336,stroke:#333,color:#fff
+```
+
+---
+
+
 
