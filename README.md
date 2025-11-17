@@ -306,3 +306,17 @@ flowchart TD
 ```
 
 ---
+
+## `AuthorizationHandler` — Người quyết định quyền truy cập
+
+> **"Policy chỉ định yêu cầu — Handler kiểm tra thực tế."**
+
+### Cấu trúc
+```csharp
+protected override Task HandleRequirementAsync(
+    AuthorizationHandlerContext context,
+    TRequirement requirement)
+{
+    if (điều_kiện) context.Succeed(requirement);
+    return Task.CompletedTask;
+}
