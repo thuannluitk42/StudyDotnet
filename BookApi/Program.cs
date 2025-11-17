@@ -1,38 +1,32 @@
 ﻿// System + Microsoft
 using System.Reflection;
 using System.Text;
-
-// Microsoft ASP.NET Core
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-
-// OpenAPI + Swagger
-using Microsoft.OpenApi;
-
-// FluentValidation
-using FluentValidation;
-using FluentValidation.AspNetCore;
-
-// Project namespaces
+using System.Text.Json;
+using AspNetCoreRateLimit;
+using BookApi.Authorization;
 using BookApi.Binders;
 using BookApi.Brokers;
 using BookApi.Constraints;
 using BookApi.Data;
-using BookApi.Extensions;
-using BookApi.Middleware;
 using BookApi.Models;
 using BookApi.Services;
 using BookApi.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
-using BookApi.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // === 1. THE STANDARD DI (Ch3.7) ===
 builder.Services.AddSingleton<IStorageBroker, InMemoryStorageBroker>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthorizationHandler, MinimumAgeHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, DepartmentHandler>();
 builder.Services.AddTransient<BookApi.Services.ILogger, ConsoleLogger>();
@@ -56,7 +50,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<BookForCreationDtoValidator>();
 
-// === 4. JWT AUTHENTICATION & AUTHORIZATION ===
+// === 4. JWT AUTHENTICATION ===
 builder.Services.AddAuthentication("Bearer")
 	.AddJwtBearer("Bearer", options =>
 	{
@@ -73,14 +67,16 @@ builder.Services.AddAuthentication("Bearer")
 		};
 	});
 
-builder.Services.AddAuthorization();
+// === 5. POLICY-BASED AUTHORIZATION (GỘP LẠI) ===
+builder.Services.AddAuthorization(options =>
+{
+	options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
+	options.AddPolicy("MinimumAge", policy => policy.Requirements.Add(new MinimumAgeRequirement(18)));
+	options.AddPolicy("RequireITDepartment", policy => policy.Requirements.Add(new DepartmentRequirement("IT")));
+});
 
-// === 5. AUTH SERVICE DI ===
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-// === 6. MVC + JSON ===
-builder.Services.AddControllers()
-	.AddNewtonsoftJson();
+// === 6. MVC + JSON (DÙNG SYSTEM.TEXT.JSON) ===
+builder.Services.AddControllers();
 
 // === 7. SWAGGER + XML COMMENTS ===
 builder.Services.AddEndpointsApiExplorer();
@@ -99,21 +95,29 @@ builder.Services.AddSwaggerGen(c =>
 		c.IncludeXmlComments(xmlPath);
 });
 
-// === POLICY-BASED AUTHORIZATION ===
-builder.Services.AddAuthorization(options =>
-{
-	options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
-	options.AddPolicy("MinimumAge", policy => policy.Requirements.Add(new MinimumAgeRequirement(18)));
-	options.AddPolicy("RequireITDepartment", policy => policy.Requirements.Add(new DepartmentRequirement("IT")));
-});
+// === 8. RATE LIMITING ===
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
 
-// === 8. .NET 10 DI DIAGNOSTICS (DEV ONLY) ===
-if (builder.Environment.IsDevelopment())
-{
-	builder.Services.AddDiagnostics();
-}
+// === 9. HEALTH CHECKS ===
+builder.Services.AddHealthChecks()
+	.AddSqlite("Data Source=bookapi.db", name: "sqlite")
+	.AddMemoryHealthCheck("memory", thresholdInBytes: 1_000_000_000);
 
-// === 9. CORS ===
+// === 10. HEALTH UI ===
+builder.Services.AddHealthChecksUI(opt =>
+{
+	opt.SetEvaluationTimeInSeconds(10);
+	opt.MaximumHistoryEntriesPerEndpoint(60);
+	opt.SetApiMaxActiveRequests(1);
+	opt.AddHealthCheckEndpoint("default api", "/health");
+}).AddInMemoryStorage();
+
+// === 11. CORS ===
 builder.Services.AddCors(options =>
 {
 	options.AddDefaultPolicy(policy =>
@@ -122,7 +126,7 @@ builder.Services.AddCors(options =>
 			  .AllowAnyMethod());
 });
 
-// === 10. CUSTOM ROUTE CONSTRAINT ===
+// === 12. CUSTOM ROUTE CONSTRAINT ===
 builder.Services.Configure<RouteOptions>(options =>
 {
 	options.ConstraintMap["year"] = typeof(YearRouteConstraint);
@@ -136,21 +140,19 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 
-	// Auto migrate
+	// Auto migrate + SeedData
 	using var scope = app.Services.CreateScope();
 	var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 	db.Database.Migrate();
-
-	// TẠO USER + ROLE
 	await SeedData.InitializeAsync(scope.ServiceProvider);
 }
 
-// === SECURITY & MIDDLEWARE ===
-app.UseHttpsRedirection();     // 1. HTTPS
-app.UseRequestTiming();        // 2. Timing
-app.UseCors();                 // 3. CORS
-app.UseAuthentication();       // 4. AuthN
-app.UseAuthorization();        // 5. AuthZ
+// === MIDDLEWARE PIPELINE — THỨ TỰ ĐÚNG (MABROUK’S ORDER) ===
+app.UseHttpsRedirection();
+app.UseCors();
+app.UseAuthentication();    // PHẢI TRƯỚC Rate Limiting
+app.UseAuthorization();
+app.UseIpRateLimiting();    // SAU Auth để lấy User.Identity
 
 // === GLOBAL EXCEPTION HANDLER ===
 app.UseExceptionHandler(errorApp =>
@@ -158,16 +160,39 @@ app.UseExceptionHandler(errorApp =>
 	errorApp.Run(async context =>
 	{
 		context.Response.StatusCode = 500;
-		await context.Response.WriteAsync("Something went wrong! Please try again later.");
+		context.Response.ContentType = "application/json";
+		await context.Response.WriteAsync(JsonSerializer.Serialize(new
+		{
+			error = "Internal Server Error",
+			message = "Something went wrong! Please try again later."
+		}));
 	});
 });
+
+// === CUSTOM 429 RESPONSE (SAU Rate Limiting) ===
+app.Use(async (context, next) =>
+{
+	await next();
+	if (context.Response.StatusCode == 429)
+	{
+		context.Response.ContentType = "application/json";
+		await context.Response.WriteAsync(JsonSerializer.Serialize(new
+		{
+			error = "Too Many Requests",
+			retryAfter = context.Response.Headers["Retry-After"].ToString()
+		}));
+	}
+});
+
+// === HEALTH ENDPOINTS ===
+app.MapHealthChecks("/health");
+app.MapHealthChecksUI(opt => opt.UIPath = "/health-ui");
 
 // === ENDPOINTS ===
 app.MapControllers();
 
 // === MINIMAL API ===
 app.MapGet("/hello", () => "Hello from Minimal API!");
-
 app.MapPost("/echo", (Book book) => Results.Ok(book))
    .WithName("EchoBook");
 

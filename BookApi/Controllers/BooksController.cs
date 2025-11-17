@@ -25,7 +25,7 @@ public class BooksController : ControllerBase
 		var validationResult = await _bookService.ValidateBookForCreationAsync(dto);
 		if (!validationResult.IsValid)
 		{
-			return ValidationProblem(); // TỰ ĐỘNG
+			return ValidationProblem();
 		}
 
 		var book = new Book
@@ -68,7 +68,7 @@ public class BooksController : ControllerBase
 		var validationResult = await _bookService.ValidateBookForUpdateAsync(dto);
 		if (!validationResult.IsValid)
 		{
-			return ValidationProblem(); // TỰ ĐỘNG
+			return ValidationProblem();
 		}
 
 		var existing = await _bookService.GetBookByIdAsync(id);
