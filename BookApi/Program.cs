@@ -1,4 +1,4 @@
-﻿// System + Microsoft
+﻿// Usings
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -17,13 +17,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// === 1. THE STANDARD DI (Ch3.7) ===
+// === 1. THE STANDARD DI ===
 builder.Services.AddSingleton<IStorageBroker, InMemoryStorageBroker>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -33,7 +33,8 @@ builder.Services.AddTransient<BookApi.Services.ILogger, ConsoleLogger>();
 
 // === 2. DATABASE + IDENTITY ===
 builder.Services.AddDbContext<AppDbContext>(options =>
-	options.UseSqlite("Data Source=bookapi.db"));
+	options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
+					  ?? "Data Source=bookapi.db"));
 
 builder.Services.AddIdentity<AppUser, IdentityRole>()
 	.AddEntityFrameworkStores<AppDbContext>()
@@ -67,7 +68,7 @@ builder.Services.AddAuthentication("Bearer")
 		};
 	});
 
-// === 5. POLICY-BASED AUTHORIZATION (GỘP LẠI) ===
+// === 5. POLICY-BASED AUTHORIZATION ===
 builder.Services.AddAuthorization(options =>
 {
 	options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
@@ -75,10 +76,10 @@ builder.Services.AddAuthorization(options =>
 	options.AddPolicy("RequireITDepartment", policy => policy.Requirements.Add(new DepartmentRequirement("IT")));
 });
 
-// === 6. MVC + JSON (DÙNG SYSTEM.TEXT.JSON) ===
+// === 6. MVC CONTROLLERS ===
 builder.Services.AddControllers();
 
-// === 7. SWAGGER + XML COMMENTS ===
+// === 7. SWAGGER ===
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -103,10 +104,13 @@ builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounte
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
 
-// === 9. HEALTH CHECKS ===
+// === 9. HEALTH CHECKS — ĐÃ SỬA HOÀN CHỈNH ===
 builder.Services.AddHealthChecks()
-	.AddSqlite("Data Source=bookapi.db", name: "sqlite")
-	.AddMemoryHealthCheck("memory", thresholdInBytes: 1_000_000_000);
+	.AddSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
+			   ?? "Data Source=bookapi.db", name: "SQLite")
+	// kiểm tra bộ nhớ mà tiến trình đang cấp phát (MB)
+	.AddProcessAllocatedMemoryHealthCheck(1024, name: "ProcessAllocatedMemory") // 1024 MB limit. 
+	.AddProcessHealthCheck("dotnet", processes => processes.Length > 0, name: "DotnetProcess"); // kiểm tra có tiến trình .NET (ví dụ) đang chạy hay không
 
 // === 10. HEALTH UI ===
 builder.Services.AddHealthChecksUI(opt =>
@@ -140,19 +144,19 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 
-	// Auto migrate + SeedData
+	// Auto migrate + Seed admin user
 	using var scope = app.Services.CreateScope();
 	var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 	db.Database.Migrate();
 	await SeedData.InitializeAsync(scope.ServiceProvider);
 }
 
-// === MIDDLEWARE PIPELINE — THỨ TỰ ĐÚNG (MABROUK’S ORDER) ===
+// === MIDDLEWARE PIPELINE — THỨ TỰ CHUẨN ===
 app.UseHttpsRedirection();
 app.UseCors();
-app.UseAuthentication();    // PHẢI TRƯỚC Rate Limiting
+app.UseAuthentication();
 app.UseAuthorization();
-app.UseIpRateLimiting();    // SAU Auth để lấy User.Identity
+app.UseIpRateLimiting();
 
 // === GLOBAL EXCEPTION HANDLER ===
 app.UseExceptionHandler(errorApp =>
@@ -169,7 +173,7 @@ app.UseExceptionHandler(errorApp =>
 	});
 });
 
-// === CUSTOM 429 RESPONSE (SAU Rate Limiting) ===
+// === CUSTOM 429 RESPONSE ===
 app.Use(async (context, next) =>
 {
 	await next();
