@@ -16,41 +16,18 @@ namespace BookApi.Services
 		private readonly AppDbContext _context;
 		private readonly IConfiguration _config;
 
-		public AuthService(UserManager<AppUser> userManager, AppDbContext context, IConfiguration config)
+		public AuthService(
+			UserManager<AppUser> userManager,
+			AppDbContext context,
+			IConfiguration config)
 		{
 			_userManager = userManager;
 			_context = context;
 			_config = config;
 		}
 
-		//public async Task<string> LoginAsync(LoginDto dto)
-		//{
-		//	if (dto.Email != "studydotnet@yopmail.com" || dto.Password != "Abc12345@") 
-		//		throw new UnauthorizedAccessException("Invalid credentials");
-
-		//	var claims = new[]
-		//	{
-		//	new Claim(ClaimTypes.NameIdentifier, "1"),
-		//	new Claim(ClaimTypes.Email, dto.Email),
-		//	new Claim(ClaimTypes.Role, "Admin")
-		//};
-
-		//	var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
-		//	var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-		//	var token = new JwtSecurityToken(
-		//		issuer: _config["Jwt:Issuer"],
-		//		audience: _config["Jwt:Audience"],
-		//		claims: claims,
-		//		expires: DateTime.Now.AddMinutes(60),
-		//		signingCredentials: creds
-		//	);
-
-		//	return await Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token));
-		//}
-
 		// ==================================================================
-		// 1. LOGIN → ACCESS + REFRESH TOKEN
+		// 1. LOGIN → ACCESS + REFRESH TOKEN + CUSTOM CLAIMS
 		// ==================================================================
 		public async Task<AuthResponse> LoginAsync(LoginDto dto)
 		{
@@ -77,10 +54,10 @@ namespace BookApi.Services
 		public async Task<AuthResponse> RefreshTokenAsync(string refreshToken)
 		{
 			var rt = await _context.RefreshTokens
-					.FirstOrDefaultAsync<RefreshToken>(t =>
-						t.Token == refreshToken &&
-						!t.IsRevoked &&
-						t.Expires > DateTime.UtcNow);
+				.FirstOrDefaultAsync<RefreshToken>(t =>
+					t.Token == refreshToken &&
+					!t.IsRevoked &&
+					t.Expires > DateTime.UtcNow);
 
 			if (rt == null)
 				throw new UnauthorizedAccessException("Invalid or expired refresh token");
@@ -89,10 +66,8 @@ namespace BookApi.Services
 			if (user == null)
 				throw new UnauthorizedAccessException("User not found");
 
-			// Revoke token cũ
 			rt.IsRevoked = true;
 
-			// Cấp mới
 			var (newAccessToken, newExpires) = await GenerateAccessTokenAsync(user);
 			var newRefreshToken = GenerateRefreshToken();
 
@@ -123,7 +98,7 @@ namespace BookApi.Services
 		}
 
 		// ==================================================================
-		// HELPER: TẠO ACCESS TOKEN (JWT)
+		// HELPER: TẠO ACCESS TOKEN VỚI CUSTOM CLAIMS (DÙNG CHO POLICY)
 		// ==================================================================
 		private async Task<(string token, DateTime expires)> GenerateAccessTokenAsync(AppUser user)
 		{
@@ -131,7 +106,10 @@ namespace BookApi.Services
 		{
 			new Claim(ClaimTypes.NameIdentifier, user.Id),
 			new Claim(ClaimTypes.Email, user.Email!),
-			new Claim(ClaimTypes.Name, user.FullName ?? user.UserName!)
+			new Claim(ClaimTypes.Name, user.FullName ?? user.UserName!),
+            // CUSTOM CLAIMS CHO POLICY
+            new Claim("age", "25"),
+			new Claim("department", "IT")
 		};
 
 			var roles = await _userManager.GetRolesAsync(user);
@@ -140,7 +118,7 @@ namespace BookApi.Services
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-			var expires = DateTime.UtcNow.AddMinutes(60); // 60 phút
+			var expires = DateTime.UtcNow.AddMinutes(60);
 
 			var token = new JwtSecurityToken(
 				issuer: _config["Jwt:Issuer"],
@@ -154,7 +132,7 @@ namespace BookApi.Services
 		}
 
 		// ==================================================================
-		// HELPER: TẠO REFRESH TOKEN (RANDOM 64 BYTES)
+		// HELPER: TẠO REFRESH TOKEN (64 BYTES)
 		// ==================================================================
 		private string GenerateRefreshToken()
 		{
@@ -171,12 +149,38 @@ namespace BookApi.Services
 			{
 				UserId = userId,
 				Token = token,
-				Expires = DateTime.UtcNow.AddDays(7), // 7 ngày
+				Expires = DateTime.UtcNow.AddDays(7),
 				IsRevoked = false
 			};
 
 			_context.RefreshTokens.Add(refreshToken);
 			await _context.SaveChangesAsync();
 		}
+
+		//public async Task<string> LoginAsync(LoginDto dto)
+		//{
+		//	if (dto.Email != "studydotnet@yopmail.com" || dto.Password != "Abc12345@") 
+		//		throw new UnauthorizedAccessException("Invalid credentials");
+
+		//	var claims = new[]
+		//	{
+		//	new Claim(ClaimTypes.NameIdentifier, "1"),
+		//	new Claim(ClaimTypes.Email, dto.Email),
+		//	new Claim(ClaimTypes.Role, "Admin")
+		//};
+
+		//	var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+		//	var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+		//	var token = new JwtSecurityToken(
+		//		issuer: _config["Jwt:Issuer"],
+		//		audience: _config["Jwt:Audience"],
+		//		claims: claims,
+		//		expires: DateTime.Now.AddMinutes(60),
+		//		signingCredentials: creds
+		//	);
+
+		//	return await Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token));
+		//}
 	}
 }

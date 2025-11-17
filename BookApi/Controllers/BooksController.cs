@@ -101,6 +101,14 @@ public class BooksController : ControllerBase
 	}
 
 	[HttpGet("admin")]
-	[Authorize(Roles = "Admin")]
-	public IActionResult AdminOnly() => Ok("Welcome, Admin!");
+	[Authorize(Policy = "RequireAdmin")]
+	public IActionResult AdminOnly() => Ok("Welcome Admin! Only Admin can see this.");
+
+	[HttpGet("adult")]
+	[Authorize(Policy = "MinimumAge")]
+	public IActionResult AdultOnly() => Ok("You are 18+! Content for adults.");
+
+	[HttpGet("it")]
+	[Authorize(Policy = "RequireITDepartment")]
+	public IActionResult ITOnly() => Ok("IT Department only! Sensitive data here.");
 }

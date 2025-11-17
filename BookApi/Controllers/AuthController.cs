@@ -1,5 +1,6 @@
 ﻿using BookApi.Models.Dto;
 using BookApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookApi.Controllers
@@ -60,6 +61,18 @@ namespace BookApi.Controllers
 			};
 			Response.Cookies.Append("refreshToken", token, cookieOptions);
 		}
+
+		[Authorize(Policy = "RequireAdmin")]
+		[HttpGet("admin")]
+		public IActionResult AdminOnly() => Ok("Welcome Admin!");
+
+		[Authorize(Policy = "MinimumAge")]
+		[HttpGet("adult")]
+		public IActionResult AdultOnly() => Ok("You are 18+");
+
+		[Authorize(Policy = "RequireITDepartment")]
+		[HttpGet("it")]
+		public IActionResult ITOnly() => Ok("IT Department only");
 
 		//[HttpPost("register")]
 		//public async Task<IActionResult> Register([FromBody] RegisterDto dto)

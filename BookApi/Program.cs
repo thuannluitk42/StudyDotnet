@@ -25,12 +25,16 @@ using BookApi.Middleware;
 using BookApi.Models;
 using BookApi.Services;
 using BookApi.Validators;
+using Microsoft.AspNetCore.Authorization;
+using BookApi.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // === 1. THE STANDARD DI (Ch3.7) ===
 builder.Services.AddSingleton<IStorageBroker, InMemoryStorageBroker>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IAuthorizationHandler, MinimumAgeHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, DepartmentHandler>();
 builder.Services.AddTransient<BookApi.Services.ILogger, ConsoleLogger>();
 
 // === 2. DATABASE + IDENTITY ===
@@ -93,6 +97,14 @@ builder.Services.AddSwaggerGen(c =>
 	var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 	if (File.Exists(xmlPath))
 		c.IncludeXmlComments(xmlPath);
+});
+
+// === POLICY-BASED AUTHORIZATION ===
+builder.Services.AddAuthorization(options =>
+{
+	options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
+	options.AddPolicy("MinimumAge", policy => policy.Requirements.Add(new MinimumAgeRequirement(18)));
+	options.AddPolicy("RequireITDepartment", policy => policy.Requirements.Add(new DepartmentRequirement("IT")));
 });
 
 // === 8. .NET 10 DI DIAGNOSTICS (DEV ONLY) ===
