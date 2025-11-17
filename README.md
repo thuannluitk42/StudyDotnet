@@ -264,6 +264,21 @@ flowchart TD
 
 ---
 
+### **DAY 7 — CHƯƠNG 10: Refresh Token + Identity**
+
+| STT | Câu hỏi                               | Trả lời ngắn gọn                       | Trả lời chi tiết (phỏng vấn)                                      |
+|-----|----------------------------------------|------------------------------------------|--------------------------------------------------------------------|
+| 1   | Refresh Token lưu ở đâu?               | DB + HttpOnly Cookie                    | Không lưu trong JWT → chống replay attack. Lưu trong bảng RefreshTokens, HttpOnly → chống XSS |
+| 2   | Tại sao không gửi Refresh Token trong JSON? | Dễ bị XSS                              | HttpOnly Cookie → JS không đọc được                               |
+| 3   | Revoke Refresh Token thế nào?          | IsRevoked = true                         | Khi refresh → xóa token cũ, cấp token mới                         |
+| 4   | Access Token hết hạn → 401 → làm gì?   | Gọi /refresh                             | Client tự động gọi /api/auth/refresh                              |
+| 5   | Làm sao có user trong bookapi.db?      | SeedData hoặc /register                  | SeedData.InitializeAsync() → tạo admin@book.com                   |
+| 6   | Refresh Token có trong JWT không?      | Không                                    | JWT chỉ chứa Access Token (60 phút)                               |
+| 7   | HttpOnly Cookie có an toàn không?      | Có                                       | Chống XSS, nhưng cần HTTPS                                        |
+| 8   | Refresh Token hết hạn sau bao lâu?     | 7 ngày                                   | DateTime.UtcNow.AddDays(7)                                        |
+
+---
+
 ##Luồng Refresh Token + Identity
 
 ```mermaid
@@ -272,7 +287,7 @@ flowchart TD
     B --> C["UserManager.FindByEmailAsync"]
     C --> D["CheckPasswordAsync"]
     
-    D -->|Success| E["[2. Generate]"]
+    D -->|Success| E["[2. Generate Tokens]"]
     E --> F["Access Token (60 phút)"]
     E --> G["Refresh Token (7 ngày)"]
     
@@ -291,10 +306,11 @@ flowchart TD
     O --> Q["DB Check: Token hợp lệ?"]
     
     Q -->|Yes| R["Cấp mới Access + Refresh"]
-    R --> S["Revoke cũ, lưu mới vào DB"]
-    R --> T["Trả Access Token + Cookie mới"]
+    R --> S["Revoke cũ (IsRevoked = true)"]
+    R --> T["Lưu token mới vào DB"]
+    R --> U["Trả Access Token + Cookie mới"]
     
-    Q -->|No| U["401 Invalid Token"]
+    Q -->|No| V["401 Invalid Token"]
 
     style A fill:#2196F3,stroke:#333,color:#fff
     style B fill:#4CAF50,stroke:#333,color:#fff
@@ -319,3 +335,52 @@ protected override Task HandleRequirementAsync(
     if (điều_kiện) context.Succeed(requirement);
     return Task.CompletedTask;
 }
+```
+---
+
+### **DAY 8 — CHƯƠNG 11: Policy-Based Authorization**
+
+| STT | Câu hỏi                                | Trả lời ngắn gọn                         | Trả lời chi tiết (phỏng vấn)                                       |
+|-----|-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------|
+| 9   | Policy khác Role thế nào?               | Linh hoạt hơn                             | Role cứng nhắc, Policy dùng Requirement + Handler                  |
+| 10  | AuthorizationHandler làm gì?            | Kiểm tra requirement                      | Gọi context.Succeed() hoặc Fail()                                  |
+| 11  | context.Succeed() vs Fail()?            | Cho phép / Từ chối                        | Succeed() → 200, Fail() → 403                                      |
+| 12  | Policy đăng ký ở đâu?                   | Program.cs                                | builder.Services.AddAuthorization()                                 |
+| 13  | Handler đăng ký thế nào?                | AddScoped<IAuthorizationHandler, ...>     | Mỗi request 1 instance                                              |
+| 14  | Dùng claim age trong Policy được không? | Được                                      | FindFirst("age") → int.TryParse                                     |
+| 15  | Tại sao không dùng [Authorize(Roles)]?  | Không linh hoạt                           | Không kiểm tra claim tùy chỉnh                                     |
+| 16  | Handler có cần async không?             | Không                                     | Trả Task.CompletedTask                                              |
+
+---
+
+##Luồng Policy-Based Authorization
+
+```mermaid
+flowchart TD
+    A["[CLIENT]"] -->|"GET /api/books/it"| B["Middleware Pipeline"]
+    B --> C["Authentication: JWT Valid?"]
+    
+    C -->|Yes| D["Authorization: Check Policy"]
+    D --> E["Tìm Policy: RequireITDepartment"]
+    E --> F["Tìm Requirement: DepartmentRequirement('IT')"]
+    F --> G["Gọi Handler: DepartmentHandler"]
+    
+    G --> H{"Kiểm tra claim 'department'?"}
+    H -->|Có + == 'IT'| I["context.Succeed(requirement)"]
+    H -->|Không| J["context.Fail() (mặc định)"]
+    
+    I --> K["200 OK"]
+    J --> L["403 Forbidden"]
+    C -->|No| M["401 Unauthorized"]
+
+    style A fill:#2196F3,stroke:#333,color:#fff
+    style C fill:#4CAF50,stroke:#333,color:#fff
+    style G fill:#FF9800,stroke:#333,color:#fff
+    style K fill:#8BC34A,stroke:#333,color:#fff
+    style L fill:#F44336,stroke:#333,color:#fff
+    style M fill:#F44336,stroke:#333,color:#fff
+    
+```
+---
+
+
