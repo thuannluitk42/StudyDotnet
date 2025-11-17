@@ -14,6 +14,7 @@
 | **Day 6** | **Ch9** | **Authentication & Authorization** | JWT, `[Authorize]`, `401 → 200` |
 | **Day 7** | **Ch10** | **Refresh Token + Identity** | SQLite, HttpOnly Cookie, Revoke, SeedData |
 | **Day 8** | **Ch11** | **Policy-Based Auth** | `RequireAdmin`, `MinimumAge`, `DepartmentHandler` |
+| **Day 9** | **Ch12** | **Rate Limiting + Health Checks** | `Health Check Memory`, `Rate Limiting` |
 
 ---
 
@@ -279,7 +280,7 @@ flowchart TD
 
 ---
 
-##Luồng Refresh Token + Identity
+### **Luồng Refresh Token + Identity**
 
 ```mermaid
 flowchart TD
@@ -381,6 +382,36 @@ flowchart TD
     style M fill:#F44336,stroke:#333,color:#fff
     
 ```
+---
+
+### **Day 9 — Chương 12: Rate Limiting + Health Checks**
+
+| Khái niệm              | Mô tả                              | Ví dụ / Endpoint                     |
+|-----------------------|-------------------------------------|---------------------------------------|
+| **Health Checks**     | Kiểm tra trạng thái API             | `/health` → `"Healthy"`               |
+| **Health UI**         | Dashboard trực quan                 | `/health-ui` → biểu đồ đẹp           |
+| **AddSqlite**         | Kiểm tra kết nối DB                 | SQLite connected?                     |
+| **AddProcessHealthCheck** | Kiểm tra memory của process     | RAM < 1GB → Healthy, > 1GB → Degraded
+
+| Câu hỏi                          | Trả lời ngắn                   | Trả lời chi tiết |
+|----------------------------------|---------------------------------|------------------|
+| **Health Check Memory .NET 10?** | `AddProcessHealthCheck` + lambda |------------------|
+| **Package cho Memory?** | `AspNetCore.HealthChecks.System` |------------------|
+| **Rate Limiting chống DDoS?** | `AspNetCoreRateLimit` + `GeneralRules` |------------------|
+| **Rate Limiting chống DDoS?**    | `AspNetCoreRateLimit`           | **GeneralRules**: 120 req/phút, whitelist localhost |
+| **Health Check trong .NET 10?**  | `AddProcessHealthCheck`         | Kiểm tra memory, SQLite → `/health-ui` |
+| **Package cho Memory Check?**    | `AspNetCore.HealthChecks.System` | Dùng `AddProcessHealthCheck` + lambda |
+| **Custom 429 response?**         | JSON + `Retry-After`            | Middleware: `Use(async (context, next) => { await next(); if (429) ... })` |
+| **Health UI config?**            | `AddHealthChecksUI`             | `EvaluationTimeInSeconds(10)`, `MaximumHistoryEntriesPerEndpoint(60)` |
+
+## SO SÁNH — KHÔNG RATE LIMITING VS CÓ
+
+|                     | **Không Rate Limiting** | **Có Rate Limiting**       |
+|---------------------|--------------------------|-----------------------------|
+| DDoS > 500 req/s    | 500 lỗi (Internal)       | **429 + Retry-After**       |
+| API chậm            | Không bảo vệ tài nguyên  | **Bảo vệ tài nguyên**       |
+| Client spam         | Không kiểm soát          | **Tự động chặn IP**         |
+
 ---
 
 ## MERMAID — RATE LIMITING FLOW
