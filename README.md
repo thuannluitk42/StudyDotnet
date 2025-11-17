@@ -304,7 +304,6 @@ flowchart TD
     style R fill:#8BC34A,stroke:#333,color:#fff
 
 ```
-
 ---
 
 ## `AuthorizationHandler` — Người quyết định quyền truy cập
