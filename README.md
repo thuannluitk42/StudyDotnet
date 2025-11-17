@@ -196,8 +196,6 @@ flowchart TD
 
 ## Luồng Refresh Token + Identity (Mabrouk’s Security Pattern)
 
-## Luồng Refresh Token + Identity (Mabrouk’s Security Pattern)
-
 ```mermaid
 flowchart TD
     A["[CLIENT]"] -->|"POST /api/auth/login"| B["[1. Identity]"]
