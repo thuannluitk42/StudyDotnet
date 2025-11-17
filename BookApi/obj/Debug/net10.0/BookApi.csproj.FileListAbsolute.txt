@@ -60,7 +60,7 @@ D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\HealthChecks.UI.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\HealthChecks.UI.Client.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\HealthChecks.UI.Core.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\HealthChecks.UI.Data.dll
-D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\HealthChecks.UI.InMemory.Storage.dll
+D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\HealthChecks.UI.SQLite.Storage.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\AspNetCoreRateLimit.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\FluentValidation.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\FluentValidation.AspNetCore.dll
@@ -89,7 +89,6 @@ D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.Data.Sqlite
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Abstractions.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Design.dll
-D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.InMemory.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Relational.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Sqlite.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\bin\Debug\net10.0\Microsoft.Extensions.DependencyModel.dll

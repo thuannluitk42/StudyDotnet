@@ -68,7 +68,7 @@
               "target": "Package",
               "version": "[9.0.0, )"
             },
-            "AspNetCore.HealthChecks.UI.InMemory.Storage": {
+            "AspNetCore.HealthChecks.UI.SQLite.Storage": {
               "target": "Package",
               "version": "[9.0.0, )"
             },

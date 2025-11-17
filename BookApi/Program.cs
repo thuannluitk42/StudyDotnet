@@ -1,5 +1,4 @@
-﻿// Usings
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using AspNetCoreRateLimit;
@@ -8,16 +7,18 @@ using BookApi.Binders;
 using BookApi.Brokers;
 using BookApi.Constraints;
 using BookApi.Data;
+using BookApi.HealthChecks;
 using BookApi.Models;
 using BookApi.Services;
 using BookApi.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
@@ -104,13 +105,11 @@ builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounte
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
 
-// === 9. HEALTH CHECKS — ĐÃ SỬA HOÀN CHỈNH ===
+// === 9. HEALTH CHECKS ===
 builder.Services.AddHealthChecks()
 	.AddSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
 			   ?? "Data Source=bookapi.db", name: "SQLite")
-	// kiểm tra bộ nhớ mà tiến trình đang cấp phát (MB)
-	.AddProcessAllocatedMemoryHealthCheck(1024, name: "ProcessAllocatedMemory") // 1024 MB limit. 
-	.AddProcessHealthCheck("dotnet", processes => processes.Length > 0, name: "DotnetProcess"); // kiểm tra có tiến trình .NET (ví dụ) đang chạy hay không
+	.AddCheck<MemoryHealthCheck>("Memory");
 
 // === 10. HEALTH UI ===
 builder.Services.AddHealthChecksUI(opt =>
@@ -119,7 +118,8 @@ builder.Services.AddHealthChecksUI(opt =>
 	opt.MaximumHistoryEntriesPerEndpoint(60);
 	opt.SetApiMaxActiveRequests(1);
 	opt.AddHealthCheckEndpoint("default api", "/health");
-}).AddInMemoryStorage();
+})
+.AddSqliteStorage("Data Source=healthchecks_ui.db");
 
 // === 11. CORS ===
 builder.Services.AddCors(options =>
@@ -151,7 +151,7 @@ if (app.Environment.IsDevelopment())
 	await SeedData.InitializeAsync(scope.ServiceProvider);
 }
 
-// === MIDDLEWARE PIPELINE — THỨ TỰ CHUẨN ===
+// === MIDDLEWARE PIPELINE ===
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
@@ -189,7 +189,11 @@ app.Use(async (context, next) =>
 });
 
 // === HEALTH ENDPOINTS ===
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+	ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
 app.MapHealthChecksUI(opt => opt.UIPath = "/health-ui");
 
 // === ENDPOINTS ===

@@ -13,11 +13,6 @@
         ],
         "requestBody": {
           "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginDto"
-              }
-            },
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/LoginDto"
@@ -49,11 +44,6 @@
         ],
         "requestBody": {
           "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefreshRequest"
-              }
-            },
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/RefreshRequest"
@@ -85,11 +75,6 @@
         ],
         "requestBody": {
           "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefreshRequest"
-              }
-            },
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/RefreshRequest"
@@ -223,11 +208,6 @@
         ],
         "requestBody": {
           "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/BookForCreationDto"
-              }
-            },
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/BookForCreationDto"
@@ -327,11 +307,6 @@
         ],
         "requestBody": {
           "content": {
-            "application/json-patch+json": {
-              "schema": {
-                "$ref": "#/components/schemas/BookForUpdateDto"
-              }
-            },
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/BookForUpdateDto"

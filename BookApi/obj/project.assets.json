@@ -104,19 +104,19 @@
           }
         }
       },
-      "AspNetCore.HealthChecks.UI.InMemory.Storage/9.0.0": {
+      "AspNetCore.HealthChecks.UI.SQLite.Storage/9.0.0": {
         "type": "package",
         "dependencies": {
           "AspNetCore.HealthChecks.UI.Data": "9.0.0",
-          "Microsoft.EntityFrameworkCore.InMemory": "8.0.11"
+          "Microsoft.EntityFrameworkCore.Sqlite": "8.0.11"
         },
         "compile": {
-          "lib/net8.0/HealthChecks.UI.InMemory.Storage.dll": {
+          "lib/net8.0/HealthChecks.UI.SQLite.Storage.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net8.0/HealthChecks.UI.InMemory.Storage.dll": {
+          "lib/net8.0/HealthChecks.UI.SQLite.Storage.dll": {
             "related": ".xml"
           }
         }
@@ -1135,22 +1135,6 @@
           "build/net10.0/Microsoft.EntityFrameworkCore.Design.props": {}
         }
       },
-      "Microsoft.EntityFrameworkCore.InMemory/8.0.11": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore": "8.0.11"
-        },
-        "compile": {
-          "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll": {
-            "related": ".xml"
-          }
-        }
-      },
       "Microsoft.EntityFrameworkCore.Relational/10.0.0": {
         "type": "package",
         "dependencies": {
@@ -2126,18 +2110,18 @@
         "lib/net8.0/HealthChecks.UI.Data.xml"
       ]
     },
-    "AspNetCore.HealthChecks.UI.InMemory.Storage/9.0.0": {
-      "sha512": "xuq+HBH8Ckz9r5d+yP1pk7cgIbPLBqCGfYu0MxtvbtsxIo7cv5nQoUCJsdgqN5/a4ndVUJZco6GjWFk6r4xN1w==",
+    "AspNetCore.HealthChecks.UI.SQLite.Storage/9.0.0": {
+      "sha512": "vKe4kCKNtcZPmrlL6gjZIr1rFHftqkA1xeJKL59gxu2mp55bMcplyn2WM09Dexeno7IEVojZjm2l6cQkldsfng==",
       "type": "package",
-      "path": "aspnetcore.healthchecks.ui.inmemory.storage/9.0.0",
+      "path": "aspnetcore.healthchecks.ui.sqlite.storage/9.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "aspnetcore.healthchecks.ui.inmemory.storage.9.0.0.nupkg.sha512",
-        "aspnetcore.healthchecks.ui.inmemory.storage.nuspec",
+        "aspnetcore.healthchecks.ui.sqlite.storage.9.0.0.nupkg.sha512",
+        "aspnetcore.healthchecks.ui.sqlite.storage.nuspec",
         "icon.png",
-        "lib/net8.0/HealthChecks.UI.InMemory.Storage.dll",
-        "lib/net8.0/HealthChecks.UI.InMemory.Storage.xml"
+        "lib/net8.0/HealthChecks.UI.SQLite.Storage.dll",
+        "lib/net8.0/HealthChecks.UI.SQLite.Storage.xml"
       ]
     },
     "AspNetCoreRateLimit/5.0.0": {
@@ -3653,21 +3637,6 @@
         "microsoft.entityframeworkcore.design.nuspec"
       ]
     },
-    "Microsoft.EntityFrameworkCore.InMemory/8.0.11": {
-      "sha512": "gFFdubZlRfudSw94OxO7s8OvLQZncnR0S1ll//wRtZP3mMYVeq8DrMnEILK6hBJwbTBB1SNm3apg9SdvdE/ySg==",
-      "type": "package",
-      "path": "microsoft.entityframeworkcore.inmemory/8.0.11",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "PACKAGE.md",
-        "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll",
-        "lib/net8.0/Microsoft.EntityFrameworkCore.InMemory.xml",
-        "microsoft.entityframeworkcore.inmemory.8.0.11.nupkg.sha512",
-        "microsoft.entityframeworkcore.inmemory.nuspec"
-      ]
-    },
     "Microsoft.EntityFrameworkCore.Relational/10.0.0": {
       "sha512": "A3MX1ee7RDxWCUdx/KqP+74fbksz0UIhkVZh56YHvbPkEKsffCXgHU3LGkRDwqR/MrBNWLCWC/IVX79tzM30ZA==",
       "type": "package",
@@ -5137,7 +5106,7 @@
       "AspNetCore.HealthChecks.System >= 9.0.0",
       "AspNetCore.HealthChecks.UI >= 9.0.0",
       "AspNetCore.HealthChecks.UI.Client >= 9.0.0",
-      "AspNetCore.HealthChecks.UI.InMemory.Storage >= 9.0.0",
+      "AspNetCore.HealthChecks.UI.SQLite.Storage >= 9.0.0",
       "AspNetCoreRateLimit >= 5.0.0",
       "FluentValidation.AspNetCore >= 11.3.1",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 10.0.0",
@@ -5223,7 +5192,7 @@
             "target": "Package",
             "version": "[9.0.0, )"
           },
-          "AspNetCore.HealthChecks.UI.InMemory.Storage": {
+          "AspNetCore.HealthChecks.UI.SQLite.Storage": {
             "target": "Package",
             "version": "[9.0.0, )"
           },

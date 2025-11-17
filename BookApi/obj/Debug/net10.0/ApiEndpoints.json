@@ -188,7 +188,7 @@
   },
   {
     "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_10",
+    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_13",
     "RelativePath": "api/books/by-date",
     "HttpMethod": "GET",
     "IsController": false,
@@ -253,7 +253,7 @@
   },
   {
     "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_9",
+    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_12",
     "RelativePath": "echo",
     "HttpMethod": "POST",
     "IsController": false,
@@ -276,7 +276,7 @@
   },
   {
     "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_8",
+    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_11",
     "RelativePath": "hello",
     "HttpMethod": "GET",
     "IsController": false,
