@@ -7,6 +7,7 @@ using BookApi.Services;
 using BookApi.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -140,5 +141,36 @@ public static class ServiceExtensions
 		builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimiting"));
 		builder.Services.AddInMemoryRateLimiting();
 		builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+	}
+
+	public static void ConfigureRabbitMq(this WebApplicationBuilder builder)
+	{
+		builder.Services.AddMassTransit(x =>
+		{
+			// Register consumers
+			x.AddConsumer<BookApi.Consumers.EmailConsumer>();
+			x.AddConsumer<BookApi.Consumers.BookAnalyticsConsumer>();
+
+			x.UsingRabbitMq((context, cfg) =>
+			{
+				var rabbitHost = builder.Configuration["RabbitMQ:Host"] ?? "localhost";
+				var rabbitUser = builder.Configuration["RabbitMQ:Username"] ?? "guest";
+				var rabbitPass = builder.Configuration["RabbitMQ:Password"] ?? "guest";
+
+				cfg.Host(rabbitHost, "/", h =>
+				{
+					h.Username(rabbitUser);
+					h.Password(rabbitPass);
+				});
+
+				// Configure retry policy: 5 retries with exponential backoff
+				cfg.UseMessageRetry(r => r.Exponential(5,
+					TimeSpan.FromSeconds(1),
+					TimeSpan.FromSeconds(30),
+					TimeSpan.FromSeconds(2)));
+
+				cfg.ConfigureEndpoints(context);
+			});
+		});
 	}
 }

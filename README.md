@@ -15,6 +15,7 @@
 | **Day 7** | **Ch10** | **Refresh Token + Identity** | SQLite, HttpOnly Cookie, Revoke, SeedData |
 | **Day 8** | **Ch11** | **Policy-Based Auth** | `RequireAdmin`, `MinimumAge`, `DepartmentHandler` |
 | **Day 9** | **Ch12** | **Rate Limiting + Health Checks** | `Health Check Memory`, `Rate Limiting` |
+| **Day 10** | **Ch14** | **RabbitMQ + Message Queue** | `RabbitMQ + Message Queue` |
 
 ---
 
@@ -451,6 +452,52 @@ flowchart TD
 ```
 
 ---
+
+**Day 14 — Chương 14: RabbitMQ + Message Queue**
+
+|**Khái niệm**|**Mô tả**|**Ví dụ / Thành phần**|
+|**Message Queue**|Giao tiếp bất đồng bộ, tách Producer ↔ Consumer|Xử lý gửi email, log, nhiệm vụ nặng|
+|**RabbitMQ (AMQP Broker)**|Nhận, lưu, phân phối message|rabbitmq:3-management|
+|**Exchange**|Nhận message và route đến Queue|Fanout / Direct / Topic|
+|**Fanout Exchange**|Broadcast đến tất cả Queue|Thông báo sự kiện|
+|**Direct Exchange**|Route theo routing key chính xác|email.created|
+|**Topic Exchange**|Route theo pattern|logs.error.\*|
+|**Durable Queue**|Tồn tại sau restart|Lưu message lâu dài|
+|**DLQ (Dead Letter Queue)**|Lưu message lỗi để xử lý sau|Queue \*.dlq|
+|**Consumer**|Dịch vụ xử lý message|BackgroundService / MassTransit Consumer|
+|**ACK / NACK**|Xác nhận thành công / thất bại|ACK = OK, NACK = retry hoặc DLQ|
+
+|**Câu hỏi**|**Trả lời ngắn**|**Trả lời chi tiết**|
+|**RabbitMQ dùng để làm gì?**|Xử lý bất đồng bộ|Tách API và worker, tránh block request, phù hợp event-driven|
+|**Exchange hoạt động ra sao?**|Nhận + route message|Fanout (broadcast), Direct (match key), Topic (pattern)|
+|**Routing Key là gì?**|Chuỗi điều hướng message|Exchange Direct/Topic dùng routing key để chọn queue đích|
+|**Queue Durable nghĩa là gì?**|Không mất khi restart|Tối ưu cho hệ thống cần reliability cao|
+|**DLQ dùng khi nào?**|Message lỗi nhiều lần|Giữ các message thất bại để debug hoặc xử lý lại|
+|**MassTransit hỗ trợ gì?**|Publish/Consume đơn giản|Tự declare queue, handle retry, serialization, background consumer|
+|**Retry trong RabbitMQ thực hiện thế nào?**|Immediate / Interval / Backoff|Retry 3–5 lần → đưa vào DLQ nếu vẫn lỗi|
+|**Auto-Ack có nguy hiểm không?**|Có|Auto-ack làm mất message nếu consumer crash giữa chừng|
+|**Testing RabbitMQ thế nào?**|Testcontainers|Spin-up RabbitMQ thật trong integration test để verify publish/consume|
+|**Lỗi Queue Not Declared?**|Chưa tạo queue|Declare queue trước khi publish hoặc dùng MassTransit auto-create|
+
+---
+
+##Workflow for RabbitMQ Integration
+
+```mermaid
+flowchart TD
+    A[Producer: API/Service] -->|Publish Message| B[Exchange]
+    B -->|Route by Type/Key| C[Binding]
+    C -->|Deliver to| D[Queue]
+    D -->|Pull Message| E[Consumer: Background Service]
+    E -->|Process + ACK| F[Success: Log/Complete]
+    E -->|Fail + NACK| G[Retry or DLQ]
+    G -->|Analyze/Fix| H[Dead Letter Queue]
+    style A fill:#f9f,stroke:#333
+    style H fill:#bbf,stroke:#f66
+```
+
+---
+
 
 
 

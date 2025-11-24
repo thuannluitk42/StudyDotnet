@@ -1,8 +1,10 @@
 ﻿using BookApi.Binders;
 using BookApi.Extensions;
+using BookApi.Messages;
 using BookApi.Models;
 using BookApi.Models.Dto;
 using BookApi.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +15,20 @@ namespace BookApi.Controllers;
 public class BooksController : ControllerBase
 {
 	private readonly IBookService _bookService;
+	private readonly IPublishEndpoint _publishEndpoint;
+	private readonly ILogger<BooksController> _logger;
+	private readonly IConfiguration _configuration;
 
-	public BooksController(IBookService bookService)
+	public BooksController(
+		IBookService bookService,
+		IPublishEndpoint publishEndpoint,
+		ILogger<BooksController> logger,
+		IConfiguration configuration)
 	{
 		_bookService = bookService;
+		_publishEndpoint = publishEndpoint;
+		_logger = logger;
+		_configuration = configuration;
 	}
 
 	[HttpPost]
@@ -35,6 +47,34 @@ public class BooksController : ControllerBase
 		};
 
 		await _bookService.AddBookAsync(book);
+
+		_ = Task.Run(async () =>
+		{
+			try
+			{
+				await _publishEndpoint.Publish(new BookCreatedEvent
+				{
+					BookId = book.Id,
+					Title = book.Title,
+					Author = book.Author,
+					PublishedYear = book.PublishedYear
+				});
+
+				await _publishEndpoint.Publish(new SendEmailCommand
+				{
+					To = _configuration["Notifications:AdminEmail"] ?? "admin@bookapi.com",
+					Subject = $"New Book Created: {book.Title}",
+					Body = $"Book '{book.Title}' by {book.Author} ({book.PublishedYear}) has been added to the library."
+				});
+
+				_logger.LogInformation("📨 Published events for book {BookId}", book.Id);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Failed to publish events for book {BookId}", book.Id);
+			}
+		});
+
 		return CreatedAtAction(nameof(Get), new { id = book.Id }, book);
 	}
 
@@ -81,6 +121,24 @@ public class BooksController : ControllerBase
 		if (book == null) return NotFound();
 
 		await _bookService.DeleteBookAsync(id);
+
+		_ = Task.Run(async () =>
+		{
+			try
+			{
+				await _publishEndpoint.Publish(new BookDeletedEvent
+				{
+					BookId = id
+				});
+
+				_logger.LogInformation("📨 Published BookDeletedEvent for book {BookId}", id);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Failed to publish BookDeletedEvent for book {BookId}", id);
+			}
+		});
+
 		return NoContent();
 	}
 

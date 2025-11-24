@@ -15,6 +15,7 @@ builder.ConfigureJwt();
 builder.ConfigureCors();
 builder.ConfigureControllers();
 builder.ConfigureCustomServices();
+builder.ConfigureRabbitMq();
 
 // Register route constraints
 builder.Services.Configure<RouteOptions>(options =>
