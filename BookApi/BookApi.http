@@ -149,3 +149,9 @@ Authorization: Bearer {{access_token}}
 ### 4. POLICY: IT DEPARTMENT → 200
 GET {{host}}/api/books/it
 Authorization: Bearer {{access_token}}
+
+### 1. GỌI API NHIỀU LẦN → LẦN 2 SIÊU NHANH (CACHE HIT)
+GET {{host}}/api/books
+
+### 2. TẠO SÁCH MỚI → CACHE BỊ XÓA
+POST {{host}}/api/books

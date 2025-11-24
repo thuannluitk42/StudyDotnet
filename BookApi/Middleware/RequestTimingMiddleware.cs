@@ -14,7 +14,7 @@ public class RequestTimingMiddleware
 	public async Task InvokeAsync(HttpContext context)
 	{
 		var stopwatch = Stopwatch.StartNew();
-		await _next(context);  // Chạy middleware tiếp theo
+		await _next(context);
 		stopwatch.Stop();
 
 		var time = stopwatch.ElapsedMilliseconds;

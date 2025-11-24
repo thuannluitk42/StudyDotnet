@@ -1,10 +1,17 @@
 {
-  "openapi": "3.0.4",
+  "openapi": "3.1.1",
   "info": {
-    "title": "Book API (.NET 10 RC2)",
-    "description": "Mastering ASP.NET Core 10 — Mabrouk Mahdhi",
-    "version": "v1"
+    "title": "BookApi | v1",
+    "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "https://localhost:7209"
+    },
+    {
+      "url": "http://localhost:5238"
+    }
+  ],
   "paths": {
     "/api/auth/login": {
       "post": {
@@ -28,7 +35,8 @@
                 "$ref": "#/components/schemas/LoginDto"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -59,7 +67,8 @@
                 "$ref": "#/components/schemas/RefreshRequest"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -90,7 +99,8 @@
                 "$ref": "#/components/schemas/RefreshRequest"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -135,72 +145,6 @@
         }
       }
     },
-    "/hello": {
-      "get": {
-        "tags": [
-          "BookApi"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/echo": {
-      "post": {
-        "tags": [
-          "BookApi"
-        ],
-        "operationId": "EchoBook",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Book"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/books/by-date": {
-      "get": {
-        "tags": [
-          "BookApi"
-        ],
-        "operationId": "GetByDate",
-        "parameters": [
-          {
-            "name": "date",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Books": {
       "post": {
         "tags": [
@@ -223,7 +167,8 @@
                 "$ref": "#/components/schemas/BookForCreationDto"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -279,6 +224,7 @@
             "in": "path",
             "required": true,
             "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": "integer",
               "format": "int32"
             }
@@ -300,6 +246,7 @@
             "in": "path",
             "required": true,
             "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": "integer",
               "format": "int32"
             }
@@ -322,7 +269,8 @@
                 "$ref": "#/components/schemas/BookForUpdateDto"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -340,6 +288,7 @@
             "in": "path",
             "required": true,
             "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": "integer",
               "format": "int32"
             }
@@ -363,7 +312,11 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
               "format": "int32"
             }
           }
@@ -440,97 +393,102 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           },
           "title": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "author": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "publishedDate": {
             "type": "string",
             "format": "date-time"
           },
           "publishedYear": {
-            "type": "integer",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "BookForCreationDto": {
         "type": "object",
         "properties": {
           "title": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "author": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "publishedYear": {
-            "type": "integer",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
             "format": "int32"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "BookForUpdateDto": {
         "type": "object",
         "properties": {
           "title": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "author": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "publishedYear": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "LoginDto": {
         "type": "object",
         "properties": {
           "email": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "password": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "RefreshRequest": {
         "type": "object",
         "properties": {
           "refreshToken": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
-        },
-        "additionalProperties": false
+        }
       }
     }
   },
   "tags": [
     {
       "name": "Auth"
-    },
-    {
-      "name": "BookApi"
     },
     {
       "name": "Books"

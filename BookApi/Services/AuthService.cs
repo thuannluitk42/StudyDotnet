@@ -32,7 +32,12 @@ namespace BookApi.Services
 		public async Task<AuthResponse> LoginAsync(LoginDto dto)
 		{
 			var user = await _userManager.FindByEmailAsync(dto.Email);
-			if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
+
+			if (user == null)
+				throw new UnauthorizedAccessException("Invalid credentials");
+
+			var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+			if (!isPasswordValid)
 				throw new UnauthorizedAccessException("Invalid credentials");
 
 			var (accessToken, expires) = await GenerateAccessTokenAsync(user);

@@ -1,6 +1,4 @@
 ﻿using BookApi.Models;
-using BookApi.Models.Dto;
-using FluentValidation.Results;
 
 namespace BookApi.Brokers
 {

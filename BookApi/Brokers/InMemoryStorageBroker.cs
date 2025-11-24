@@ -17,7 +17,6 @@ public class InMemoryStorageBroker : IStorageBroker
 	public async Task<Book?> GetBookByIdAsync(int id)
 		=> await Task.FromResult(_books.FirstOrDefault(b => b.Id == id));
 
-	// ĐÃ THÊM: GetBooksByYearAsync
 	public async Task<List<Book>> GetBooksByYearAsync(int year)
 		=> await Task.FromResult(_books.Where(b => b.PublishedYear == year).ToList());
 

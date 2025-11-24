@@ -168,6 +168,22 @@
   },
   {
     "ContainingType": "BookApi.Controllers.BooksController",
+    "Method": "GetBooksByYear",
+    "RelativePath": "api/Books/{year}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookApi.Controllers.BooksController",
     "Method": "AdminOnly",
     "RelativePath": "api/Books/admin",
     "HttpMethod": "GET",
@@ -185,29 +201,6 @@
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_13",
-    "RelativePath": "api/books/by-date",
-    "HttpMethod": "GET",
-    "IsController": false,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "date",
-        "Type": "System.DateTime",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "System.Void",
-        "MediaTypes": [],
-        "StatusCode": 200
-      }
-    ],
-    "EndpointName": "GetByDate"
   },
   {
     "ContainingType": "BookApi.Controllers.BooksController",
@@ -234,62 +227,5 @@
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": []
-  },
-  {
-    "ContainingType": "BookApi.Controllers.BooksController",
-    "Method": "GetBooksByYear",
-    "RelativePath": "api/Books/year/{year}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "year",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_12",
-    "RelativePath": "echo",
-    "HttpMethod": "POST",
-    "IsController": false,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "book",
-        "Type": "BookApi.Models.Book",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "System.Void",
-        "MediaTypes": [],
-        "StatusCode": 200
-      }
-    ],
-    "EndpointName": "EchoBook"
-  },
-  {
-    "ContainingType": "Program\u002B\u003C\u003Ec",
-    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_11",
-    "RelativePath": "hello",
-    "HttpMethod": "GET",
-    "IsController": false,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "System.String",
-        "MediaTypes": [
-          "text/plain"
-        ],
-        "StatusCode": 200
-      }
-    ]
   }
 ]

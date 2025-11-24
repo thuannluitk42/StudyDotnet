@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251114093603_AddRefreshToken")]
-    partial class AddRefreshToken
+    [Migration("20251121071521_InitialIdentityMigration")]
+    partial class InitialIdentityMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -86,6 +86,31 @@ namespace BookApi.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("BookApi.Models.Book", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("PublishedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PublishedYear")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Books");
                 });
 
             modelBuilder.Entity("BookApi.Models.RefreshToken", b =>

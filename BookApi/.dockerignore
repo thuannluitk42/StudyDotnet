@@ -1,0 +1,81 @@
+# -------------------------
+# Build outputs
+# -------------------------
+bin/
+obj/
+*/bin/
+*/obj/
+
+# -------------------------
+# IDE / Editor
+# -------------------------
+.vs/
+.vscode/
+.idea/
+
+# -------------------------
+# User-specific / OS
+# -------------------------
+*.user
+*.suo
+*.ntvs*
+*.DS_Store
+Thumbs.db
+
+# -------------------------
+# Source control
+# -------------------------
+.git/
+.gitignore
+
+# -------------------------
+# Docker / Compose local files
+# -------------------------
+Dockerfile*
+docker-compose.*
+.dockerignore
+
+# -------------------------
+# Logs / temp
+# -------------------------
+*.log
+logs/
+tmp/
+temp/
+
+# -------------------------
+# Local DB / caches / publish outputs
+# -------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.mdf
+*.ldf
+publish/
+**/Migrations/
+
+# -------------------------
+# Secrets / env
+# -------------------------
+*.env
+secrets.json
+appsettings.Development.json
+*.pfx
+*.key
+*.pem
+
+# -------------------------
+# Packages / tooling
+# -------------------------
+packages/
+node_modules/
+.nuget/
+.vsconfig
+
+# -------------------------
+# Misc
+# -------------------------
+coverage/
+coverage.* 
+*.coverage
+test-results/
