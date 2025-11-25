@@ -496,6 +496,107 @@ flowchart TD
 ```
 
 ---
+## 1\. **Message Queue là gì?**
+
+*   Là **hàng đợi chứa các “việc cần làm”**.
+*   Khi API nhận request nặng → **không làm ngay** → chỉ **đẩy công việc vào queue**, còn xử lý sẽ do **background worker** làm sau.
+*   Lợi ích:
+*   API chạy nhanh, không bị nghẽn.
+*   Không bị crash khi traffic tăng đột biến.
+*   Tách biệt (decouple) giữa API và service xử lý nặng.
+
+👉 Ví dụ dễ hiểu:
+*   Người dùng bấm: “Gửi email”.
+*   API **không tự gửi email**, nó chỉ **đẩy 1 message vào queue**.
+*   Worker (consumer) âm thầm xử lý → gửi email.
+
+## 2\. RabbitMQ là gì?
+
+RabbitMQ là một **message broker** – phần mềm giúp:
+*   Nhận message
+*   Lưu vào queue
+*   Phân phối tới “consumer” xử lý
+*   Đảm bảo không mất dữ liệu (nếu cấu hình durable + persist)
+Nó giống như **bưu điện**, còn message giống **thư**.
+
+RabbitMQ hỗ trợ:
+*   Exchange (quyết định message đi đâu)
+*   Queue (nơi lưu)
+*   Routing (điều hướng)
+*   ACK/NACK (báo là đã xử lý xong hoặc thất bại).
+
+## 3\. Tại sao ASP.NET Core nên dùng RabbitMQ?
+
+*   API không bị chậm do xử lý nặng.
+*   Giảm tải database.
+*   Dùng rất phù hợp cho microservices.
+*   Có retry + DLQ → message lỗi không bị mất.
+*   Traffic tăng cao vẫn chạy mượt vì queue sẽ đỡ “sốc”.
+
+**Ví dụ thực tế trong API của bạn**
+*   Upload file lớn.
+*   Send email, SMS.
+*   Đồng bộ dữ liệu sang hệ thống khác.
+*   Xử lý báo cáo, thống kê.
+
+## 4\. Tích hợp RabbitMQ trong ASP.NET Core (dễ hiểu nhất)
+
+Dùng thư viện **MassTransit**:
+*   Cấu hình RabbitMQ trong DI.
+*   Trong Controller → gọi `IPublishEndpoint.Publish()`.
+*   Trong Worker → implement `IConsumer<T>` để xử lý message.
+*   Như vậy API = producer; worker = consumer.
+
+## 5\. Các Exchange của RabbitMQ
+
+|Loại         |Dùng khi                                         |
+|-------------|-------------------------------------------------|
+|**Fanout**   |Gửi 1 message → tất cả queue đều nhận (broadcast)|
+|**Direct**   |Gửi theo đúng routing key                        |
+|**Topic**    |Gửi theo pattern, kiểu "order.*"                 |
+|**Headers**  |Lọc message bằng header                          |
+
+## 6\. Durable, Auto-Delete, Exclusive là gì?
+
+*   **Durable** → queue sống sau khi RabbitMQ restart (nên bật trong production).
+*   **Auto-delete** → queue tự xóa khi không còn ai sử dụng.
+*   **Exclusive** → chỉ 1 connection dùng được, đóng app là mất luôn.
+
+## 7\. Dead Letter Queue (DLQ)
+
+*   Khi message lỗi N lần → RabbitMQ chuyển qua DLQ.
+*   Mục đích:
+*   Không làm “kẹt” queue chính.
+*   Không mất message lỗi → còn để kiểm tra thủ công.
+Trong MassTransit thì DLQ + Retry đã có built-in.
+
+## 8\. Retry & Backoff
+
+*   Consumer xử lý lỗi → thử lại (retry).
+*   Exponential backoff: 1s → 5s → 30s → 2 phút …
+*   Tránh tình trạng “spam retry” gây vỡ hệ thống.
+
+## 9\. Khi nào nên dùng Queue trong kiến trúc "The Standard"?
+
+*   Tách API khỏi background process.
+*   Hệ thống có xử lý nặng / chạy lâu.
+*   Muốn hệ thống ổn định, scale tốt.
+
+## 10\. Lỗi RabbitMQ phổ biến
+
+*   Queue not found → quên declare.
+*   Mất message → chưa bật persistent/durable.
+*   Auto-ack → chưa xử lý xong mà ack → mất dữ liệu.
+*   Channel closed → retry lại kết nối.
+
+## 11\. RabbitMQ vs Kafka (ngắn gọn)
+
+|RabbitMQ                           |Kafka                                  |
+|-----------------------------------|---------------------------------------|
+|Task queue, routing linh hoạt      |Xử lý streaming dữ liệu lớn            |
+|Message “biến mất” sau khi xử lý   |Message giữ lại lâu (log)              |
+|Dễ dùng                            |Phức tạp hơn                           |
+|Dùng cho API và microservices      |Dùng cho phân tích dữ liệu, events lớn |
 
 
 
