@@ -259,7 +259,6 @@ D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\staticwebassets.build
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\staticwebassets.development.json
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\staticwebassets.build.endpoints.json
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\swae.build.ex.cache
-D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.csproj.Up2Date
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\BookApi.dll
 D:\Study\.Net\AspNetCoreBootcamp\BookApi\obj\Debug\net10.0\refint\BookApi.dll
