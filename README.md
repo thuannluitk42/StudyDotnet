@@ -598,6 +598,83 @@ Trong MassTransit thì DLQ + Retry đã có built-in.
 |Dễ dùng                            |Phức tạp hơn                           |
 |Dùng cho API và microservices      |Dùng cho phân tích dữ liệu, events lớn |
 
+---
 
+## 🏗️ Kiến Trúc Hệ Thống
 
+### 🧩 Monolithic → Microservices Evolution
 
+```mermaid
+graph TD
+    A[Monolith App] --> B[Shared DB]
+    A --> C[Cache]
+    A --> D[Queue]
+    style A fill:#f9f,stroke:#333,stroke-width:4px
+
+    E[BookService] --> F[Book DB]
+    G[OrderService] --> H[Order DB]
+    E --> I[RabbitMQ/gRPC]
+    G --> I
+    style E fill:#bbf,stroke:#f66
+    style G fill:#bbf,stroke:#f66
+```
+
+---
+
+### 🧩 Swarm Deployment Flow Diagram
+
+```mermaid
+flowchart TD
+    A[Run docker swarm init] --> B[Manager Node Created]
+    C[Add Worker Nodes] -->|docker swarm join --token| B
+    B --> D[Create docker-compose.yml with services]
+    D --> E[Deploy Stack: docker stack deploy -c docker-compose.yml bookstack]
+    E --> F[Swarm Schedules Tasks to Nodes]
+    F --> G[Auto Load Balancing + Scaling]
+    G --> H[Health Checks + Auto-Restart Failed Tasks]
+    style A fill:#f9f,stroke:#333,stroke-width:4px
+    style H fill:#bbf,stroke:#f66,stroke-width:2px
+```
+
+---
+
+## So sánh Monolith vs Microservices
+
+|Aspect          | Monolith                                 | Microservices
+|----------------|------------------------------------------| -----------------------------------------------
+|Architecture    |Single codebase, all features in one app. | Independent services, each for specific domain.
+|Scalability     |Scale toàn app                            | Scale từng service
+|Deployment      |Dễ downtime nếu lỗi                       | Zero-downtime deploy
+|Tech Stack      |Đồng nhất (vd: .NET)                      | Polyglot (vd: .NET + Node.js)
+|Complexity      |Đơn giản ban đầu, phình to về sau         | Phức tạp network nhưng dễ mở rộng
+|Fault Tolerance |Một lỗi → sập toàn hệ thống               | Lỗi cô lập theo service
+|Use Case        |App nhỏ                                   | App lớn, đa domain
+
+---
+## System Components
+
+|Component           | Mục tiêu               | Công nghệ
+|--------------------|------------------------| ------------------
+|BookService         |CRUD Sách.              | ASP.NET
+|OrderService        |Tạo & xử lý đơn hàng    | ASP.NET
+|Event Messaging     |Đồng bộ service         | RabbitMQ
+|Service Discovery   |Internal communication  | Docker Swarm
+|Gateway (Optional)  |API Entry Point         | Traefik / Nginx
+
+---
+---
+
+## 🎤 Câu hỏi phỏng vấn về Microservices & Docker Swarm — Kèm câu trả lời
+
+| # | Câu hỏi phỏng vấn | Trả lời ngắn gọn |
+|---|------------------|----------------|
+| 1 | Sự khác nhau giữa kiến trúc Monolith và Microservices? | Monolith: toàn bộ tính năng nằm trong 1 ứng dụng, khó scale cục bộ. Microservices: mỗi dịch vụ cho 1 domain độc lập, dễ scale nhưng phức tạp hơn về giao tiếp giữa các service. |
+| 2 | Tại sao dùng Docker Swarm cho microservices? | Swarm hỗ trợ clustering, auto-scaling, load balancing, failover và dễ cấu hình hơn Kubernetes trong hệ thống nhỏ/trung bình. |
+| 3 | Giải thích các thành phần của Swarm: Node, Service, Task. | Node: máy trong cluster (manager/worker). Service: định nghĩa triển khai (ví dụ BookApi với số replicas). Task: container instance chạy 1 replica của service. |
+| 4 | Load balancing trong Swarm hoạt động thế nào? | Sử dụng Routing Mesh → chỉ cần gọi theo tên service, Swarm sẽ tự điều phối request đều đến các replicas thông qua overlay network. |
+| 5 | Overlay network trong Swarm là gì? | Mạng ảo giúp các container ở các node khác nhau có thể kết nối và tự khám phá service bằng tên. |
+| 6 | Làm sao tăng khả năng chịu lỗi (resilience) cho microservices trong Swarm? | Thêm health check, Swarm tự restart task lỗi; dùng retry & circuit breaker (như Polly); chạy nhiều replicas để tránh single point of failure. |
+| 7 | Lỗi thường gặp trong Swarm và cách khắc phục? | Node “Not Ready” → chạy lại join; service không gọi được → kiểm tra overlay network; lỗi volume → dùng NFS hoặc storage chia sẻ. |
+| 8 | Khi nào nên chọn Swarm thay vì Kubernetes? | Khi cần setup nhanh, đơn giản, ít node. Kubernetes phù hợp cho hệ thống lớn, nhiều yêu cầu về quản trị & mở rộng. |
+
+---
