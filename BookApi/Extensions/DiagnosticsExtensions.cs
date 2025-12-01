@@ -1,4 +1,4 @@
-﻿using OpenTelemetry.Metrics;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 namespace BookApi.Extensions

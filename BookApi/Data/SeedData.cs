@@ -1,8 +1,8 @@
-﻿using BookApi.Models;
+using BookApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace BookApi.Data;
+namespace BookApi.data;
 
 public static class SeedData
 {

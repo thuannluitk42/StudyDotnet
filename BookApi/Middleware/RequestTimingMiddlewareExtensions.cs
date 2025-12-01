@@ -1,4 +1,4 @@
-﻿namespace BookApi.Middleware;
+namespace BookApi.Middleware;
 
 public static class RequestTimingMiddlewareExtensions
 {

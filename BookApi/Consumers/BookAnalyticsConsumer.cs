@@ -1,4 +1,4 @@
-﻿using BookApi.Messages;
+using BookApi.Messages;
 using MassTransit;
 
 namespace BookApi.Consumers
@@ -16,13 +16,13 @@ namespace BookApi.Consumers
 		{
 			var evt = context.Message;
 
-			_logger.LogInformation("📊 Processing analytics for book {BookId}: {Title}",
+			_logger.LogInformation("?? Processing analytics for book {BookId}: {Title}",
 				evt.BookId, evt.Title);
 
 			// Simulate analytics processing
 			await Task.Delay(500);
 
-			_logger.LogInformation("✅ Analytics processed for book {BookId}", evt.BookId);
+			_logger.LogInformation("? Analytics processed for book {BookId}", evt.BookId);
 		}
 	}
 }

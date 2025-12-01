@@ -1,4 +1,4 @@
-﻿namespace BookApi.Constraints;
+namespace BookApi.Constraints;
 
 public class YearRouteConstraint : IRouteConstraint
 {

@@ -84,6 +84,14 @@
               "target": "Package",
               "version": "[11.3.1, )"
             },
+            "Grpc.AspNetCore": {
+              "target": "Package",
+              "version": "[2.71.0, )"
+            },
+            "Grpc.AspNetCore.Server.Reflection": {
+              "target": "Package",
+              "version": "[2.71.0, )"
+            },
             "MassTransit": {
               "target": "Package",
               "version": "[8.1.3, )"

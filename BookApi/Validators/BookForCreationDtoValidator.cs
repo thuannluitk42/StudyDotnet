@@ -1,4 +1,4 @@
-﻿using BookApi.Models.Dto;
+using BookApi.Models.Dto;
 using FluentValidation;
 
 namespace BookApi.Validators

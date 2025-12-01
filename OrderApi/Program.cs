@@ -1,5 +1,6 @@
 using OrderApi.Extensions;
 using Serilog;
+using OrderApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,11 @@ builder.Host.UseSerilog((ctx, lc) =>
 // Configure Services
 builder.ConfigureDatabase();
 builder.ConfigureRabbitMq();
+builder.Services.AddResiliencePatterns();
+// Add gRPC client with Polly resilience patterns
+builder.Services.AddGrpcClientWithResilience(builder.Configuration);
+// Keep BookGrpcClient as wrapper (optional - for backward compatibility)
+builder.Services.AddSingleton<BookGrpcClient>();
 builder.ConfigureControllers();
 
 // Add OpenAPI/Swagger
@@ -37,3 +43,4 @@ app.Logger.LogInformation("🚀 OrderApi is running on {Urls}",
     string.Join(", ", app.Urls));
 
 await app.RunAsync();
+public partial class Program { }

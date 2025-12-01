@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option csharp_namespace = "BookApi.Protos";
+
+package book;
+
+service BookService {
+  // Unary RPC
+  rpc GetBook (GetBookRequest) returns (BookResponse);
+  
+  // Server Streaming RPC
+  rpc GetBooksStream (GetBooksRequest) returns (stream BookResponse);
+}
+
+message GetBookRequest {
+  int32 id = 1;
+}
+
+message GetBooksRequest {
+  int32 page_size = 1;
+  int32 page_number = 2;
+}
+
+message BookResponse {
+  int32 id = 1;
+  string title = 2;
+}

@@ -1,8 +1,8 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using BookApi.Data;
+using BookApi.data;
 using BookApi.Models;
 using BookApi.Models.Dto;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +27,7 @@ namespace BookApi.Services
 		}
 
 		// ==================================================================
-		// 1. LOGIN → ACCESS + REFRESH TOKEN + CUSTOM CLAIMS
+		// 1. LOGIN ? ACCESS + REFRESH TOKEN + CUSTOM CLAIMS
 		// ==================================================================
 		public async Task<AuthResponse> LoginAsync(LoginDto dto)
 		{
@@ -54,7 +54,7 @@ namespace BookApi.Services
 		}
 
 		// ==================================================================
-		// 2. REFRESH TOKEN → CẤP MỚI ACCESS + REFRESH
+		// 2. REFRESH TOKEN ? C?P M?I ACCESS + REFRESH
 		// ==================================================================
 		public async Task<AuthResponse> RefreshTokenAsync(string refreshToken)
 		{
@@ -88,7 +88,7 @@ namespace BookApi.Services
 		}
 
 		// ==================================================================
-		// 3. LOGOUT → REVOKE REFRESH TOKEN
+		// 3. LOGOUT ? REVOKE REFRESH TOKEN
 		// ==================================================================
 		public async Task LogoutAsync(string refreshToken)
 		{
@@ -103,7 +103,7 @@ namespace BookApi.Services
 		}
 
 		// ==================================================================
-		// HELPER: TẠO ACCESS TOKEN VỚI CUSTOM CLAIMS (DÙNG CHO POLICY)
+		// HELPER: T?O ACCESS TOKEN V?I CUSTOM CLAIMS (D�NG CHO POLICY)
 		// ==================================================================
 		private async Task<(string token, DateTime expires)> GenerateAccessTokenAsync(AppUser user)
 		{
@@ -137,7 +137,7 @@ namespace BookApi.Services
 		}
 
 		// ==================================================================
-		// HELPER: TẠO REFRESH TOKEN (64 BYTES)
+		// HELPER: T?O REFRESH TOKEN (64 BYTES)
 		// ==================================================================
 		private string GenerateRefreshToken()
 		{
@@ -146,7 +146,7 @@ namespace BookApi.Services
 		}
 
 		// ==================================================================
-		// HELPER: LƯU REFRESH TOKEN VÀO DB
+		// HELPER: LUU REFRESH TOKEN V�O DB
 		// ==================================================================
 		private async Task SaveRefreshTokenAsync(string userId, string token)
 		{

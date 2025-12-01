@@ -5,6 +5,7 @@ using OrderApi.Data;
 using OrderApi.Messages;
 using OrderApi.Models;
 using OrderApi.Models.Dto;
+using OrderApi.Services;
 
 namespace OrderApi.Controllers
 {
@@ -15,15 +16,18 @@ namespace OrderApi.Controllers
         private readonly OrderDbContext _context;
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<OrdersController> _logger;
+		private readonly BookGrpcClient _bookGrpcClient;
 
         public OrdersController(
             OrderDbContext context,
             IPublishEndpoint publishEndpoint,
-            ILogger<OrdersController> logger)
+            ILogger<OrdersController> logger,
+			BookGrpcClient bookGrpcClient)
         {
             _context = context;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
+			_bookGrpcClient = bookGrpcClient;
         }
 
         // GET: api/orders
@@ -49,45 +53,59 @@ namespace OrderApi.Controllers
         }
 
         // POST: api/orders
-        [HttpPost]
-        public async Task<ActionResult<Order>> CreateOrder(OrderForCreationDto orderDto)
-        {
-            var order = new Order
-            {
-                BookId = orderDto.BookId,
-                BookTitle = orderDto.BookTitle,
-                BookAuthor = orderDto.BookAuthor,
-                Quantity = orderDto.Quantity,
-                UnitPrice = orderDto.UnitPrice,
-                TotalPrice = orderDto.Quantity * orderDto.UnitPrice,
-                CustomerEmail = orderDto.CustomerEmail,
-                OrderDate = DateTime.UtcNow,
-                Status = "Pending"
-            };
+		[HttpPost]
+		public async Task<ActionResult<Order>> CreateOrder(OrderForCreationDto orderDto)
+		{
+			// ✨ NEW: Validate book exists via gRPC
+			_logger.LogInformation("🔍 Validating BookId={BookId} via gRPC", orderDto.BookId);
+			
+			var bookResponse = await _bookGrpcClient.GetBookAsync(orderDto.BookId);
+			
+			if (bookResponse == null)
+			{
+				_logger.LogWarning("❌ Book not found: BookId={BookId}", orderDto.BookId);
+				return BadRequest(new { error = $"Book with ID {orderDto.BookId} not found" });
+			}
+			
+			_logger.LogInformation("✅ Book validated via gRPC: {Title}", bookResponse.Title);
+			
+			// Use book data from gRPC response
+			var order = new Order
+			{
+				BookId = orderDto.BookId,
+				BookTitle = bookResponse.Title,  // From gRPC
+				BookAuthor = orderDto.BookAuthor,
+				Quantity = orderDto.Quantity,
+				UnitPrice = orderDto.UnitPrice,
+				TotalPrice = orderDto.Quantity * orderDto.UnitPrice,
+				CustomerEmail = orderDto.CustomerEmail,
+				OrderDate = DateTime.UtcNow,
+				Status = "Pending"
+			};
 
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+			_context.Orders.Add(order);
+			await _context.SaveChangesAsync();
 
-            _logger.LogInformation("📦 Order created: OrderId={OrderId}, BookId={BookId}", 
-                order.Id, order.BookId);
+			_logger.LogInformation("📦 Order created: OrderId={OrderId}, BookId={BookId}",
+				order.Id, order.BookId);
 
-            // Publish OrderCreatedEvent
-            await _publishEndpoint.Publish(new OrderCreatedEvent
-            {
-                OrderId = order.Id,
-                BookId = order.BookId,
-                BookTitle = order.BookTitle,
-                BookAuthor = order.BookAuthor,
-                Quantity = order.Quantity,
-                TotalPrice = order.TotalPrice,
-                CustomerEmail = order.CustomerEmail,
-                CreatedAt = order.OrderDate
-            });
+			// Publish OrderCreatedEvent
+			await _publishEndpoint.Publish(new OrderCreatedEvent
+			{
+				OrderId = order.Id,
+				BookId = order.BookId,
+				BookTitle = order.BookTitle,
+				BookAuthor = order.BookAuthor,
+				Quantity = order.Quantity,
+				TotalPrice = order.TotalPrice,
+				CustomerEmail = order.CustomerEmail,
+				CreatedAt = order.OrderDate
+			});
 
-            _logger.LogInformation("✅ OrderCreatedEvent published for OrderId={OrderId}", order.Id);
+			_logger.LogInformation("✅ OrderCreatedEvent published for OrderId={OrderId}", order.Id);
 
-            return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
-        }
+			return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
+		}
 
         // PUT: api/orders/5
         [HttpPut("{id}")]
@@ -129,6 +147,42 @@ namespace OrderApi.Controllers
             _logger.LogInformation("🗑️ Order deleted: OrderId={OrderId}", id);
 
             return NoContent();
+        }
+        [HttpGet("test-stream")]
+        public async Task<IActionResult> TestStream([FromQuery] int pageSize = 5, [FromQuery] int pageNumber = 1)
+        {
+            try
+            {
+                var books = await _bookGrpcClient.GetBooksStreamAsync(pageSize, pageNumber);
+                return Ok(new { 
+                    message = "Stream completed successfully",
+                    count = books.Count,
+                    books = books.Select(b => new { b.Id, b.Title })
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to stream books");
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("test-retry")]
+        public async Task<IActionResult> TestRetry([FromQuery] int bookId = 1)
+        {
+            try
+            {
+                var book = await _bookGrpcClient.GetBookAsync(bookId);
+                return Ok(new { 
+                    message = "GetBook succeeded",
+                    book = new { book.Id, book.Title }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get book");
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
     }
 }

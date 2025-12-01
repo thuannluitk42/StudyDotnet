@@ -1,4 +1,4 @@
-﻿using Serilog.Context;
+using Serilog.Context;
 
 namespace BookApi.Middleware
 {
@@ -14,7 +14,7 @@ namespace BookApi.Middleware
 				? context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "Anonymous"
 				: "Anonymous";
 
-			// Lấy CorrelationId từ context
+			// L?y CorrelationId t? context
 			var correlationId = context.TraceIdentifier;
 
 			using (LogContext.PushProperty("UserId", userId))

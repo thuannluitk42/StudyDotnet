@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using BookApi.Brokers;
 using BookApi.Models;
 using BookApi.Models.Dto;

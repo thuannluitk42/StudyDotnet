@@ -1,4 +1,4 @@
-﻿using BookApi.Messages;
+using BookApi.Messages;
 using MassTransit;
 
 namespace BookApi.Consumers
@@ -16,7 +16,7 @@ namespace BookApi.Consumers
 		{
 			var message = context.Message;
 
-			_logger.LogInformation("📧 Sending email to {To}: {Subject}",
+			_logger.LogInformation("?? Sending email to {To}: {Subject}",
 				message.To, message.Subject);
 
 			// Simulate email sending delay
@@ -25,11 +25,11 @@ namespace BookApi.Consumers
 			// Simulate random failure for retry testing (20% failure rate)
 			if (Random.Shared.Next(0, 10) < 2)
 			{
-				_logger.LogError("❌ Failed to send email (simulated failure)");
+				_logger.LogError("? Failed to send email (simulated failure)");
 				throw new Exception("Email service unavailable");
 			}
 
-			_logger.LogInformation("✅ Email sent successfully to {To}", message.To);
+			_logger.LogInformation("? Email sent successfully to {To}", message.To);
 		}
 	}
 }

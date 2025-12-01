@@ -1,4 +1,4 @@
-﻿using BookApi.Models;
+using BookApi.Models;
 
 namespace BookApi.Brokers;
 

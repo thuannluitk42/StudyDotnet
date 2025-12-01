@@ -1,4 +1,4 @@
-﻿using BookApi.Binders;
+using BookApi.Binders;
 using BookApi.Extensions;
 using BookApi.Messages;
 using BookApi.Models;
@@ -67,7 +67,7 @@ public class BooksController : ControllerBase
 					Body = $"Book '{book.Title}' by {book.Author} ({book.PublishedYear}) has been added to the library."
 				});
 
-				_logger.LogInformation("📨 Published events for book {BookId}", book.Id);
+				_logger.LogInformation("?? Published events for book {BookId}", book.Id);
 			}
 			catch (Exception ex)
 			{
@@ -131,7 +131,7 @@ public class BooksController : ControllerBase
 					BookId = id
 				});
 
-				_logger.LogInformation("📨 Published BookDeletedEvent for book {BookId}", id);
+				_logger.LogInformation("?? Published BookDeletedEvent for book {BookId}", id);
 			}
 			catch (Exception ex)
 			{

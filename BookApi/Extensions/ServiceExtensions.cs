@@ -1,7 +1,7 @@
-﻿using AspNetCoreRateLimit;
+using AspNetCoreRateLimit;
 using BookApi.Authorization;
 using BookApi.Brokers;
-using BookApi.Data;
+using BookApi.data;
 using BookApi.Models;
 using BookApi.Services;
 using BookApi.Validators;
@@ -17,11 +17,11 @@ public static class ServiceExtensions
 {
 	public static void ConfigureDatabase(this WebApplicationBuilder builder)
 	{
-		// Lấy nguyên connection string
+		// L?y nguy�n connection string
 		var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
 			?? throw new InvalidOperationException("Connection string 'DefaultConnection' is missing.");
 
-		// Tạo folder nếu chưa có
+		// T?o folder n?u chua c�
 		var dataSource = new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder(connectionString).DataSource;
 		Directory.CreateDirectory(Path.GetDirectoryName(dataSource)!);
 
@@ -112,7 +112,7 @@ public static class ServiceExtensions
 	public static void ConfigureCustomServices(this WebApplicationBuilder builder)
 	{
 		// Book services
-		// Chuyển nguồn dữ liệu từ inmemory sang lấy dữ liệu từ bookapi.db
+		// Chuy�?n ngu�`n du~ li�?u tu` inmemory sang l�y du~ li�?u tu` bookapi.db
 		//builder.Services.AddSingleton<IStorageBroker, InMemoryStorageBroker>();
 		builder.Services.AddScoped<IStorageBroker, DatabaseStorageBroker>();
 		builder.Services.AddDistributedMemoryCache();
@@ -150,6 +150,7 @@ public static class ServiceExtensions
 			// Register consumers
 			x.AddConsumer<BookApi.Consumers.EmailConsumer>();
 			x.AddConsumer<BookApi.Consumers.BookAnalyticsConsumer>();
+			x.AddConsumer<BookApi.Consumers.OrderCreatedEventConsumer>();
 
 			x.UsingRabbitMq((context, cfg) =>
 			{

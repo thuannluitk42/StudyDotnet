@@ -1,4 +1,4 @@
-﻿namespace BookApi.Models
+namespace BookApi.Models
 {
 	public class RefreshToken
 	{

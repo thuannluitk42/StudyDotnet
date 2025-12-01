@@ -1,4 +1,4 @@
-﻿namespace BookApi.Models.Dto
+namespace BookApi.Models.Dto
 {
 	public class LoginDto
 	{

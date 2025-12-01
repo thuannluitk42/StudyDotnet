@@ -1,4 +1,4 @@
-﻿namespace BookApi.Messages
+namespace BookApi.Messages
 {
 	public record SendEmailCommand
 	{
