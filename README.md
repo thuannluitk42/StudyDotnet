@@ -662,7 +662,6 @@ flowchart TD
 |Gateway (Optional)  |API Entry Point         | Traefik / Nginx
 
 ---
----
 
 ## 🎤 Câu hỏi phỏng vấn về Microservices & Docker Swarm — Kèm câu trả lời
 
@@ -678,3 +677,30 @@ flowchart TD
 | 8 | Khi nào nên chọn Swarm thay vì Kubernetes? | Khi cần setup nhanh, đơn giản, ít node. Kubernetes phù hợp cho hệ thống lớn, nhiều yêu cầu về quản trị & mở rộng. |
 
 ---
+
+### 🧩 Microservices communication flow
+
+```mermaid
+flowchart TD
+    A[OrderService] -->|gRPC Call| B[BookService]
+    B -->|Response| A
+    A -->|Publish Event| C[RabbitMQ]
+    B -->|Consume Event| C
+    style A fill:#f9f,stroke:#333
+```
+---
+
+### 🧩 K8s deployment flow
+
+```mermaid
+flowchart TD
+    A[Create YAML: Deployment + Service] --> B[kubectl apply -f yaml]
+    B --> C[Control Plane Schedules Pods]
+    C --> D[Worker Nodes Run Pods]
+    D --> E[Service Load Balances Traffic]
+    E --> F[Auto-Scale with HPA]
+    style A fill:#f9f,stroke:#333
+    style F fill:#bbf,stroke:#f66
+```
+---
+
